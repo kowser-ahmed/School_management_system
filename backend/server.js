@@ -1,5 +1,4 @@
 const express = require("express");
-const mysql = require("mysql2/promise");
 const cors = require("cors");
 const path = require("path");
 
@@ -8,28 +7,23 @@ require("dotenv").config({
     override: true
 });
 
-console.log("DB USER:", process.env.DB_USER);
-console.log("DB PASSWORD LENGTH:", process.env.DB_PASSWORD?.length);
+const db = require("./config/db");
+const studentRoutes = require("./routes/studentRoutes");
+const classRoutes = require("./routes/classRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const db = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: Number(process.env.DB_PORT)
-});
-
+// Test backend
 app.get("/", (req, res) => {
     res.json({
         message: "School Management Software Backend is running!"
     });
 });
 
+// Test database
 app.get("/api/test-db", async (req, res) => {
     try {
         const [rows] = await db.query("SELECT 1 AS test");
@@ -49,6 +43,10 @@ app.get("/api/test-db", async (req, res) => {
         });
     }
 });
+
+// Student routes
+app.use("/api/students", studentRoutes);
+app.use("/api/classes", classRoutes);
 
 const PORT = process.env.PORT || 5000;
 
