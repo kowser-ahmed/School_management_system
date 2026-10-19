@@ -10,6 +10,7 @@ require("dotenv").config({
 const db = require("./config/db");
 const studentRoutes = require("./routes/studentRoutes");
 const classRoutes = require("./routes/classRoutes");
+const sectionRoutes = require("./routes/sectionRoutes");
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.get("/api/test-db", async (req, res) => {
 // Student routes
 app.use("/api/students", studentRoutes);
 app.use("/api/classes", classRoutes);
+app.use("/api/sections", sectionRoutes);
 
 const PORT = process.env.PORT || 5000;
 
