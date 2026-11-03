@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f5ef">
+    <title>Attendance | School Management</title>
+    <link rel="stylesheet" href="/attendance/attendance.css">
+    <script src="/attendance/attendance.js" defer></script>
+</head>
+<body>
+    <main class="shell">
+        <header class="topbar">
+            <a class="brand" href="/attendance" aria-label="Attendance home">
+                <span class="brand-mark" aria-hidden="true">A</span>
+                <span>School Management<span class="brand-subtitle">ATTENDANCE</span></span>
+            </a>
+            <form class="auth-form" id="tokenForm">
+                <label class="visually-hidden" for="attendanceToken">Attendance access token</label>
+                <input id="attendanceToken" type="password" autocomplete="off" placeholder="Attendance token" aria-label="Attendance token">
+                <button class="button button-dark" type="submit">Connect</button>
+                <span class="auth-state" id="authState">Not connected</span>
+            </form>
+            <div class="today-label" id="todayLabel"></div>
+        </header>
+
+        <section class="page-heading">
+            <div>
+                <p class="eyebrow">Daily operations</p>
+                <h1>Attendance</h1>
+            </div>
+            <div class="page-date" aria-hidden="true"><span></span> Records stay in sync with your school day</div>
+        </section>
+
+        <nav class="section-tabs" aria-label="Attendance type">
+            <button class="tab-button is-active" type="button" data-panel="studentsPanel" aria-selected="true">Students</button>
+            <button class="tab-button" type="button" data-panel="employeesPanel" aria-selected="false">Teachers &amp; staff</button>
+        </nav>
+
+        <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+
+        <section class="panel is-visible" id="studentsPanel" aria-labelledby="studentsTitle">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">Class register</p>
+                    <h2 id="studentsTitle">Student attendance</h2>
+                </div>
+                <div class="view-switch" role="group" aria-label="Student attendance view">
+                    <button class="view-button is-active" type="button" data-student-view="daily">Daily sheet</button>
+                    <button class="view-button" type="button" data-student-view="monthly">Monthly report</button>
+                </div>
+            </div>
+
+            <form class="filter-bar" id="studentFilters">
+                <label>Academic year<select id="academicYear" required><option value="">Loading years...</option></select></label>
+                <label>Class<select id="classSelect" required><option value="">Select class</option></select></label>
+                <label>Section<select id="sectionSelect" required><option value="">Select section</option></select></label>
+                <label id="studentDateLabel">Date<input id="studentDate" type="date" required></label>
+                <label id="studentMonthLabel" hidden>Month<input id="studentMonth" type="month"></label>
+                <button class="button button-dark" type="submit"><span aria-hidden="true">↗</span> Load</button>
+            </form>
+
+            <div class="summary-row" id="studentSummary" hidden></div>
+            <div class="table-wrap" id="studentTableWrap">
+                <div class="empty-state">Choose a year, class, section and date to load the register.</div>
+            </div>
+            <div class="table-footer">
+                <span id="studentCount">No students loaded</span>
+                <button class="button button-accent" id="saveStudents" type="button" disabled><span aria-hidden="true">✓</span> Save attendance</button>
+            </div>
+
+            <details class="lookup-tools">
+                <summary>Student history &amp; absence watch</summary>
+                <div class="lookup-grid">
+                    <form id="historyForm" class="lookup-form">
+                        <h3>Individual history</h3>
+                        <label>Student ID<input id="historyStudentId" type="number" min="1" required placeholder="e.g. 104"></label>
+                        <button class="button button-outline" type="submit">View history</button>
+                    </form>
+                    <form id="absenceForm" class="lookup-form">
+                        <h3>Frequent absences</h3>
+                        <label>From<input id="absenceFrom" type="date" required></label>
+                        <label>To<input id="absenceTo" type="date" required></label>
+                        <button class="button button-outline" type="submit">Find students</button>
+                    </form>
+                </div>
+                <div class="table-wrap lookup-results" id="studentLookupResults"></div>
+            </details>
+        </section>
+
+        <section class="panel" id="employeesPanel" aria-labelledby="employeesTitle" hidden>
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">People register</p>
+                    <h2 id="employeesTitle">Teachers &amp; staff</h2>
+                </div>
+                <div class="view-switch" role="group" aria-label="Employee type">
+                    <button class="view-button is-active" type="button" data-employee-type="teacher">Teachers</button>
+                    <button class="view-button" type="button" data-employee-type="staff">Staff</button>
+                </div>
+            </div>
+
+            <form class="filter-bar employee-filters" id="employeeFilters">
+                <label>Date<input id="employeeDate" type="date" required></label>
+                <button class="button button-dark" type="submit"><span aria-hidden="true">↗</span> Load register</button>
+                <label class="month-filter">Monthly report<input id="employeeMonth" type="month" required></label>
+                <button class="button button-outline" id="loadEmployeeReport" type="button">View report</button>
+            </form>
+
+            <div class="summary-row" id="employeeSummary" hidden></div>
+            <div class="table-wrap" id="employeeTableWrap">
+                <div class="empty-state">Choose a date to load the register.</div>
+            </div>
+            <div class="table-footer">
+                <span id="employeeCount">No records loaded</span>
+                <button class="button button-accent" id="saveEmployees" type="button" disabled><span aria-hidden="true">✓</span> Save records</button>
+            </div>
+            <details class="lookup-tools">
+                <summary>Employee leave records</summary>
+                <div class="lookup-grid">
+                    <form id="leaveForm" class="lookup-form">
+                        <h3>Record leave</h3>
+                        <label>Employee type<select id="leaveEmployeeType"><option value="teacher">Teacher</option><option value="staff">Staff</option></select></label>
+                        <label>Employee ID<input id="leaveEmployeeId" type="number" min="1" required></label>
+                        <label>Leave type<input id="leaveType" required maxlength="50" placeholder="Sick leave"></label>
+                        <label>Start date<input id="leaveStart" type="date" required></label>
+                        <label>End date<input id="leaveEnd" type="date" required></label>
+                        <label class="wide-field">Reason<input id="leaveReason" maxlength="255"></label>
+                        <button class="button button-outline" type="submit">Submit leave</button>
+                    </form>
+                    <form id="leaveLookupForm" class="lookup-form">
+                        <h3>Find employee leave</h3>
+                        <label>Employee type<select id="leaveLookupType"><option value="teacher">Teacher</option><option value="staff">Staff</option></select></label>
+                        <label>Employee ID<input id="leaveLookupId" type="number" min="1" required></label>
+                        <button class="button button-outline" type="submit">View leave</button>
+                    </form>
+                </div>
+                <div class="table-wrap lookup-results" id="leaveResults"></div>
+            </details>
+        </section>
+
+        <footer class="footnote">Attendance data is recorded against the selected school date.</footer>
+    </main>
+</body>
+</html>
