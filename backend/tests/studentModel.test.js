@@ -70,7 +70,7 @@ test('createStudent - should return inserted student ID', async () => {
   assert.equal(result, 5)
 })
 
-test('createStudent - should use default Active status', async () => {
+test('createStudent - should use default active status', async () => {
   let capturedValues = []
 
   db.query = async (query, values) => {
@@ -83,7 +83,7 @@ test('createStudent - should use default Active status', async () => {
     full_name: 'New Student'
   })
 
-  assert.equal(capturedValues[14], 'Active')
+  assert.equal(capturedValues[14], 'active')
 })
 
 // 4. UPDATE STUDENT
@@ -166,6 +166,41 @@ test('createStudent - should handle database error', async () => {
     studentModel.createStudent({
       student_code: 'STU008',
       full_name: 'Test Student'
+    }),
+    /Database error/
+  )
+})
+
+test('deleteStudent - should handle database error', async () => {
+  db.query = async () => {
+    throw new Error('Database error')
+  }
+
+  await assert.rejects(
+    studentModel.deleteStudent(1),
+    /Database error/
+  )
+})
+test('getStudentById - should handle database error', async () => {
+  db.query = async () => {
+    throw new Error('Database error')
+  }
+
+  await assert.rejects(
+    studentModel.getStudentById(1),
+    /Database error/
+  )
+})
+
+test('updateStudent - should handle database error', async () => {
+  db.query = async () => {
+    throw new Error('Database error')
+  }
+
+  await assert.rejects(
+    studentModel.updateStudent(1, {
+      student_code: 'STU001',
+      full_name: 'Updated Student'
     }),
     /Database error/
   )

@@ -259,3 +259,26 @@
     padding: 16px;
   }
 }
+
+/* Custom validation messages */
+.student-field-error {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.student-field input.input-error {
+  border-color: #dc2626;
+  background: #fffafa;
+}
+
+.student-field input.input-error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.student-add-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
