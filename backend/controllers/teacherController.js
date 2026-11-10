@@ -1,4 +1,32 @@
+
 const teacherModel = require("../models/teacherModel");
+
+// Handle teacher errors
+const handleTeacherError = (error, res) => {
+    if (error.code === "ER_DUP_ENTRY" || error.errno === 1062) {
+        const errorMessage = error.message?.toLowerCase() || "";
+
+        if (
+            errorMessage.includes("employee_code") ||
+            errorMessage.includes("employee code")
+        ) {
+            return res.status(409).json({
+                success: false,
+                message: "Employee Code already exists."
+            });
+        }
+
+        return res.status(409).json({
+            success: false,
+            message: "Duplicate teacher information already exists."
+        });
+    }
+
+    return res.status(500).json({
+        success: false,
+        message: error.message || "Internal server error"
+    });
+};
 
 // Get all teachers
 const getAllTeachers = async (req, res) => {
@@ -11,10 +39,7 @@ const getAllTeachers = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        return handleTeacherError(error, res);
     }
 };
 
@@ -30,16 +55,13 @@ const getTeacherById = async (req, res) => {
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             data: teacher
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        return handleTeacherError(error, res);
     }
 };
 
@@ -57,17 +79,14 @@ const createTeacher = async (req, res) => {
 
         const teacherId = await teacherModel.createTeacher(req.body);
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             message: "Teacher created successfully",
             teacher_id: teacherId
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        return handleTeacherError(error, res);
     }
 };
 
@@ -88,7 +107,7 @@ const updateTeacher = async (req, res) => {
             req.body
         );
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: affectedRows > 0
                 ? "Teacher updated successfully"
@@ -96,10 +115,7 @@ const updateTeacher = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        return handleTeacherError(error, res);
     }
 };
 
@@ -115,16 +131,13 @@ const deleteTeacher = async (req, res) => {
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             message: "Teacher deleted successfully"
         });
 
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        return handleTeacherError(error, res);
     }
 };
 

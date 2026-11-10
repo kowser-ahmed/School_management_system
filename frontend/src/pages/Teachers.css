@@ -257,3 +257,34 @@
     padding: 16px;
   }
 }
+
+/* Custom field validation messages */
+.teacher-field-error {
+  display: block;
+  color: #dc2626;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.teacher-field input.input-error,
+.teacher-field select.input-error,
+.teacher-field textarea.input-error {
+  border-color: #dc2626;
+  background-color: #fffafa;
+}
+
+.teacher-field input.input-error:focus,
+.teacher-field select.input-error:focus,
+.teacher-field textarea.input-error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.teacher-add-btn:disabled,
+.teacher-save-btn:disabled,
+.teacher-cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

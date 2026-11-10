@@ -68,9 +68,13 @@ CREATE TABLE IF NOT EXISTS students (
     guardian_phone VARCHAR(20),
     status ENUM('active','inactive','transferred') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (class_id) REFERENCES classes(class_id),
-    FOREIGN KEY (section_id) REFERENCES sections(section_id)
+    FOREIGN KEY (section_id) REFERENCES sections(section_id),
+
+    CONSTRAINT uq_students_class_section_roll
+    UNIQUE (class_id, section_id, roll_number)
 );
 
 -- =====================================================

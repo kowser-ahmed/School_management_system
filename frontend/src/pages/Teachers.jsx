@@ -25,16 +25,19 @@ function Teachers() {
   const [showForm, setShowForm] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [errors, setErrors] = useState({})
 
   // Fetch teachers
   const fetchTeachers = async () => {
     try {
       setLoading(true)
+
       const response = await API.get('/teachers')
       setTeachers(response.data.data || [])
       setError('')
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load teachers.')
+      console.error(err)
     } finally {
       setLoading(false)
     }
@@ -44,87 +47,118 @@ function Teachers() {
     fetchTeachers()
   }, [])
 
-  // Form input change
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target
+
     setFormData((prev) => ({
       ...prev,
       [name]: value
     }))
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: ''
+    }))
+
+    setError('')
+    setSuccess('')
   }
 
   // Reset form
   const resetForm = () => {
-    setFormData(initialForm)
+    setFormData({ ...initialForm })
     setEditingId(null)
     setShowForm(false)
+    setErrors({})
     setError('')
+  }
+
+  // Open add form
+  const openAddForm = () => {
+    resetForm()
+    setShowForm(true)
+    setSuccess('')
   }
 
   // Form validation
   const validateForm = () => {
-    if (!formData.employee_code.trim()) {
-      return 'Employee code is required.'
-    }
+    const newErrors = {}
 
-    if (formData.employee_code.trim().length > 30) {
-      return 'Employee code cannot exceed 30 characters.'
+    if (!formData.employee_code.trim()) {
+      newErrors.employee_code = 'Employee Code is required.'
+    } else if (formData.employee_code.trim().length > 30) {
+      newErrors.employee_code =
+        'Employee Code cannot exceed 30 characters.'
     }
 
     if (!formData.full_name.trim()) {
-      return 'Teacher name is required.'
-    }
-
-    if (formData.full_name.trim().length > 100) {
-      return 'Name cannot exceed 100 characters.'
+      newErrors.full_name = 'Teacher Name is required.'
+    } else if (formData.full_name.trim().length > 100) {
+      newErrors.full_name =
+        'Teacher Name cannot exceed 100 characters.'
     }
 
     if (
       formData.gender &&
       !['male', 'female', 'other'].includes(formData.gender)
     ) {
-      return 'Please select a valid gender.'
+      newErrors.gender = 'Please select a valid gender.'
     }
 
-    if (formData.phone.trim().length > 20) {
-      return 'Phone number cannot exceed 20 characters.'
-    }
+    const phoneRegex = /^01[3-9]\d{8}$/
 
-    if (formData.email) {
+if (
+  formData.phone.trim() &&
+  !phoneRegex.test(formData.phone.trim())
+) {
+  newErrors.phone =
+    'Enter a valid 11-digit Bangladesh phone number.'
+}
+
+    if (formData.email.trim()) {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
       if (!emailPattern.test(formData.email.trim())) {
-        return 'Please enter a valid email.'
+        newErrors.email = 'Please enter a valid email address.'
       }
     }
 
     if (formData.email.trim().length > 100) {
-      return 'Email cannot exceed 100 characters.'
+      newErrors.email = 'Email cannot exceed 100 characters.'
     }
 
     if (formData.designation.trim().length > 100) {
-      return 'Designation cannot exceed 100 characters.'
+      newErrors.designation =
+        'Designation cannot exceed 100 characters.'
     }
 
     if (
       formData.salary !== '' &&
-      (!Number.isFinite(Number(formData.salary)) ||
-        Number(formData.salary) < 0)
+      (
+        !Number.isFinite(Number(formData.salary)) ||
+        Number(formData.salary) < 0
+      )
     ) {
-      return 'Salary must be a valid non-negative number.'
+      newErrors.salary =
+        'Salary must be a valid non-negative number.'
     }
 
-    return ''
+    setErrors(newErrors)
+
+    return Object.keys(newErrors).length === 0
   }
 
   // Add or update teacher
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const validationError = validateForm()
+    if (saving) return
 
-    if (validationError) {
-      setError(validationError)
+    setError('')
+    setSuccess('')
+
+    if (!validateForm()) {
       return
     }
 
@@ -137,13 +171,14 @@ function Teachers() {
       address: formData.address.trim() || null,
       joining_date: formData.joining_date || null,
       designation: formData.designation.trim() || null,
-      salary: formData.salary === '' ? null : Number(formData.salary)
+      salary:
+        formData.salary === ''
+          ? null
+          : Number(formData.salary)
     }
 
     try {
       setSaving(true)
-      setError('')
-      setSuccess('')
 
       if (editingId !== null) {
         await API.put(`/teachers/${editingId}`, payload)
@@ -153,14 +188,45 @@ function Teachers() {
         setSuccess('Teacher added successfully.')
       }
 
-      resetForm()
+      setFormData({ ...initialForm })
+      setEditingId(null)
+      setShowForm(false)
+      setErrors({})
+
       await fetchTeachers()
     } catch (err) {
-      setError(
+      const message =
         err.response?.data?.message ||
         err.response?.data?.error ||
         'Unable to save teacher.'
-      )
+
+      const lowerMessage = message.toLowerCase()
+
+      // Show duplicate employee code error under Employee Code
+      if (
+        lowerMessage.includes('employee code') ||
+        lowerMessage.includes('employee_code') ||
+        lowerMessage.includes('duplicate entry')
+      ) {
+        setErrors((prev) => ({
+          ...prev,
+          employee_code: message
+        }))
+        setError('')
+      } else if (
+        lowerMessage.includes('full name') ||
+        lowerMessage.includes('teacher name')
+      ) {
+        setErrors((prev) => ({
+          ...prev,
+          full_name: message
+        }))
+        setError('')
+      } else {
+        setError(message)
+      }
+
+      console.error(err)
     } finally {
       setSaving(false)
     }
@@ -184,6 +250,7 @@ function Teachers() {
 
     setEditingId(teacher.teacher_id)
     setShowForm(true)
+    setErrors({})
     setError('')
     setSuccess('')
 
@@ -192,7 +259,9 @@ function Teachers() {
 
   // Delete teacher
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this teacher?')) {
+    if (
+      !window.confirm('Are you sure you want to delete this teacher?')
+    ) {
       return
     }
 
@@ -213,36 +282,45 @@ function Teachers() {
   }
 
   // Search teachers
- const query = search.trim().toLowerCase()
+  const query = search.trim().toLowerCase()
 
-const exactIdMatches = /^\d+$/.test(query)
-  ? teachers.filter(
-      (teacher) => String(teacher.teacher_id) === query
+  const exactIdMatches = /^\d+$/.test(query)
+    ? teachers.filter(
+        (teacher) => String(teacher.teacher_id) === query
+      )
+    : []
+
+  const filteredTeachers =
+    exactIdMatches.length > 0
+      ? exactIdMatches
+      : teachers.filter((teacher) => {
+          if (!query) return true
+
+          const fields = [
+            teacher.teacher_id,
+            teacher.employee_code,
+            teacher.full_name,
+            teacher.phone,
+            teacher.email,
+            teacher.designation
+          ]
+
+          return fields.some((value) =>
+            String(value ?? '').toLowerCase().includes(query)
+          )
+        })
+
+  // Reusable field error component
+  const FieldError = ({ name }) => {
+    if (!errors[name]) return null
+
+    return (
+      <span className="teacher-field-error" role="alert">
+        {errors[name]}
+      </span>
     )
-  : []
+  }
 
-const filteredTeachers =
-  exactIdMatches.length > 0
-    ? exactIdMatches
-    : teachers.filter((teacher) => {
-        if (!query) return true
-
-        const teacherId = String(teacher.teacher_id ?? '').toLowerCase()
-        const employeeCode = String(teacher.employee_code ?? '').toLowerCase()
-        const fullName = String(teacher.full_name ?? '').toLowerCase()
-        const phone = String(teacher.phone ?? '').toLowerCase()
-        const email = String(teacher.email ?? '').toLowerCase()
-        const designation = String(teacher.designation ?? '').toLowerCase()
-
-        return (
-          teacherId.includes(query) ||
-          employeeCode.includes(query) ||
-          fullName.includes(query) ||
-          phone.includes(query) ||
-          email.includes(query) ||
-          designation.includes(query)
-        )
-      })
   return (
     <div className="teacher-page">
 
@@ -255,11 +333,8 @@ const filteredTeachers =
 
         <button
           className="teacher-add-btn"
-          onClick={() => {
-            resetForm()
-            setShowForm(true)
-            setSuccess('')
-          }}
+          onClick={showForm ? resetForm : openAddForm}
+          disabled={saving}
         >
           + Add Teacher
         </button>
@@ -267,13 +342,13 @@ const filteredTeachers =
 
       {/* Messages */}
       {error && (
-        <div className="teacher-alert error">
+        <div className="teacher-alert error" role="alert">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="teacher-alert success">
+        <div className="teacher-alert success" role="status">
           {success}
         </div>
       )}
@@ -283,13 +358,23 @@ const filteredTeachers =
         <div className="teacher-form-card">
 
           <div className="teacher-form-heading">
-            <h2>{editingId !== null ? 'Edit Teacher' : 'Add New Teacher'}</h2>
-            <button type="button" onClick={resetForm}>✕</button>
+            <h2>
+              {editingId !== null ? 'Edit Teacher' : 'Add New Teacher'}
+            </h2>
+
+            <button
+              type="button"
+              onClick={resetForm}
+              disabled={saving}
+            >
+              ✕
+            </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="teacher-form-grid">
 
+              {/* Employee Code */}
               <div className="teacher-field">
                 <label>Employee Code *</label>
                 <input
@@ -298,10 +383,15 @@ const filteredTeachers =
                   onChange={handleChange}
                   maxLength={30}
                   placeholder="e.g. TCH001"
-                  required
+                  className={
+                    errors.employee_code ? 'input-error' : ''
+                  }
+                  aria-invalid={!!errors.employee_code}
                 />
+                <FieldError name="employee_code" />
               </div>
 
+              {/* Full Name */}
               <div className="teacher-field">
                 <label>Full Name *</label>
                 <input
@@ -310,35 +400,46 @@ const filteredTeachers =
                   onChange={handleChange}
                   maxLength={100}
                   placeholder="Enter full name"
-                  required
+                  className={errors.full_name ? 'input-error' : ''}
+                  aria-invalid={!!errors.full_name}
                 />
+                <FieldError name="full_name" />
               </div>
 
+              {/* Gender */}
               <div className="teacher-field">
                 <label>Gender</label>
                 <select
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
+                  className={errors.gender ? 'input-error' : ''}
+                  aria-invalid={!!errors.gender}
                 >
                   <option value="">Select gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="other">Other</option>
                 </select>
+                <FieldError name="gender" />
               </div>
 
+              {/* Phone */}
               <div className="teacher-field">
                 <label>Phone</label>
                 <input
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  maxLength={20}
-                  placeholder="Enter phone number"
+                  maxLength={11}
+placeholder="01XXXXXXXXX"
+                  className={errors.phone ? 'input-error' : ''}
+                  aria-invalid={!!errors.phone}
                 />
+                <FieldError name="phone" />
               </div>
 
+              {/* Email */}
               <div className="teacher-field">
                 <label>Email</label>
                 <input
@@ -348,9 +449,13 @@ const filteredTeachers =
                   onChange={handleChange}
                   maxLength={100}
                   placeholder="example@email.com"
+                  className={errors.email ? 'input-error' : ''}
+                  aria-invalid={!!errors.email}
                 />
+                <FieldError name="email" />
               </div>
 
+              {/* Designation */}
               <div className="teacher-field">
                 <label>Designation</label>
                 <input
@@ -359,9 +464,13 @@ const filteredTeachers =
                   onChange={handleChange}
                   maxLength={100}
                   placeholder="e.g. Senior Teacher"
+                  className={errors.designation ? 'input-error' : ''}
+                  aria-invalid={!!errors.designation}
                 />
+                <FieldError name="designation" />
               </div>
 
+              {/* Joining Date */}
               <div className="teacher-field">
                 <label>Joining Date</label>
                 <input
@@ -372,6 +481,7 @@ const filteredTeachers =
                 />
               </div>
 
+              {/* Salary */}
               <div className="teacher-field">
                 <label>Salary</label>
                 <input
@@ -382,9 +492,13 @@ const filteredTeachers =
                   min="0"
                   step="0.01"
                   placeholder="Enter salary"
+                  className={errors.salary ? 'input-error' : ''}
+                  aria-invalid={!!errors.salary}
                 />
+                <FieldError name="salary" />
               </div>
 
+              {/* Address */}
               <div className="teacher-field full-width">
                 <label>Address</label>
                 <textarea
@@ -403,6 +517,7 @@ const filteredTeachers =
                 type="button"
                 className="teacher-cancel-btn"
                 onClick={resetForm}
+                disabled={saving}
               >
                 Cancel
               </button>

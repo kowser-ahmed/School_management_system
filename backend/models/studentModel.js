@@ -94,7 +94,7 @@ const createStudent = async (student) => {
             roll_number,
             guardian_name,
             guardian_phone,
-            status || "Active"
+            status || "active"
         ]
     );
 
@@ -156,9 +156,9 @@ const updateStudent = async (id, student) => {
             section_id,
             roll_number,
             guardian_name,
-            guardian_phone,
-            status,
-            id
+guardian_phone,
+status || "active",
+id
         ]
     );
 
