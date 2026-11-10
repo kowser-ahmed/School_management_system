@@ -1,8 +1,7 @@
-
 const { test, beforeEach } = require('node:test')
 const assert = require('node:assert/strict')
-
 const studentModel = require('../models/studentModel')
+
 const {
   getAllStudents,
   getStudentById,
@@ -16,18 +15,15 @@ const createResponse = () => {
   const res = {
     statusCode: 200,
     body: null,
-
     status(code) {
       this.statusCode = code
       return this
     },
-
     json(data) {
       this.body = data
       return this
     }
   }
-
   return res
 }
 
@@ -41,7 +37,6 @@ beforeEach(() => {
 })
 
 // 1. GET ALL STUDENTS
-
 test('getAllStudents - should return student list', async () => {
   studentModel.getAllStudents = async () => [
     { student_id: 1, full_name: 'Rahim Ahmed' }
@@ -67,7 +62,6 @@ test('getAllStudents - should handle database error', async () => {
 })
 
 // 2. GET STUDENT BY ID
-
 test('getStudentById - should return student when found', async () => {
   studentModel.getStudentById = async () => ({
     student_id: 1,
@@ -96,10 +90,12 @@ test('getStudentById - should return 404 when student not found', async () => {
 })
 
 // 3. CREATE STUDENT
-
 test('createStudent - should create student with valid name', async () => {
   const req = {
-    body: { full_name: 'Karim Ahmed' }
+    body: {
+      student_code: 'STU001',
+      full_name: 'Karim Ahmed'
+    }
   }
 
   const res = createResponse()
@@ -110,9 +106,13 @@ test('createStudent - should create student with valid name', async () => {
 })
 
 test('createStudent - should reject missing student name', async () => {
-  const req = { body: {} }
-  const res = createResponse()
+  const req = {
+    body: {
+      student_code: 'STU001'
+    }
+  }
 
+  const res = createResponse()
   await createStudent(req, res)
 
   assert.equal(res.statusCode, 400)
@@ -120,13 +120,15 @@ test('createStudent - should reject missing student name', async () => {
 })
 
 // 4. UPDATE STUDENT
-
 test('updateStudent - should update existing student', async () => {
   studentModel.updateStudent = async () => 1
 
   const req = {
     params: { id: '1' },
-    body: { full_name: 'Updated Student' }
+    body: {
+      student_code: 'STU001',
+      full_name: 'Updated Student'
+    }
   }
 
   const res = createResponse()
@@ -141,7 +143,10 @@ test('updateStudent - should return 404 for missing student', async () => {
 
   const req = {
     params: { id: '999' },
-    body: { full_name: 'Unknown Student' }
+    body: {
+      student_code: 'STU999',
+      full_name: 'Unknown Student'
+    }
   }
 
   const res = createResponse()
@@ -152,7 +157,6 @@ test('updateStudent - should return 404 for missing student', async () => {
 })
 
 // 5. DELETE STUDENT
-
 test('deleteStudent - should delete existing student', async () => {
   studentModel.deleteStudent = async () => 1
 
@@ -176,11 +180,14 @@ test('deleteStudent - should return 404 when student does not exist', async () =
   assert.equal(res.statusCode, 404)
   assert.equal(res.body.message, 'Student not found')
 })
-// 6. ADDITIONAL TESTS AFTER BLACK BOX TESTING
 
+// 6. ADDITIONAL TESTS AFTER BLACK BOX TESTING
 test('createStudent - should reject empty student name', async () => {
   const req = {
-    body: { full_name: '' }
+    body: {
+      student_code: 'STU001',
+      full_name: ''
+    }
   }
 
   const res = createResponse()
@@ -196,7 +203,10 @@ test('createStudent - should handle database error', async () => {
   }
 
   const req = {
-    body: { full_name: 'Test Student' }
+    body: {
+      student_code: 'STU002',
+      full_name: 'Test Student'
+    }
   }
 
   const res = createResponse()
@@ -227,7 +237,10 @@ test('updateStudent - should handle database error', async () => {
 
   const req = {
     params: { id: '1' },
-    body: { full_name: 'Updated Student' }
+    body: {
+      student_code: 'STU001',
+      full_name: 'Updated Student'
+    }
   }
 
   const res = createResponse()
