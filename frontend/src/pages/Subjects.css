@@ -1,0 +1,183 @@
+
+.subject-heading,
+.subject-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.subject-primary-btn,
+.subject-cancel-btn,
+.subject-edit-btn,
+.subject-delete-btn {
+  border: none;
+  border-radius: 7px;
+  padding: 10px 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.subject-primary-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.subject-primary-btn:hover {
+  background: #1d4ed8;
+}
+
+.subject-primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.subject-cancel-btn {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.subject-cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.subject-form-card,
+.subject-list-card {
+  margin-bottom: 22px;
+}
+
+.subject-form-card h3,
+.subject-table-header h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.subject-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.subject-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.subject-form-group label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.subject-form-group input,
+.subject-form-group select,
+.subject-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  outline: none;
+  background: white;
+  color: #111827;
+}
+
+.subject-form-group input:focus,
+.subject-form-group select:focus,
+.subject-search:focus {
+  border-color: #2563eb;
+}
+
+.subject-full-width {
+  grid-column: 1 / -1;
+}
+
+.subject-form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.subject-table-header {
+  margin-bottom: 18px;
+}
+
+.subject-table-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.subject-search {
+  max-width: 260px;
+}
+
+.subject-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.subject-table th,
+.subject-table td {
+  padding: 13px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.subject-table th {
+  background: #f9fafb;
+  color: #374151;
+  font-size: 14px;
+}
+
+.subject-table td {
+  color: #374151;
+}
+
+.subject-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.subject-edit-btn {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.subject-delete-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.subject-message {
+  padding: 22px 10px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.subject-error {
+  color: #b91c1c;
+}
+
+.subject-error button {
+  margin-left: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 650px) {
+  .subject-form {
+    grid-template-columns: 1fr;
+  }
+
+  .subject-heading {
+    align-items: flex-start;
+  }
+
+  .subject-search {
+    max-width: 100%;
+  }
+}

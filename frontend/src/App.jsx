@@ -6,6 +6,7 @@ import Students from './pages/Students'
 import Classes from './pages/Classes'
 import Sections from './pages/Sections'
 import Teachers from './pages/Teachers'
+import Subjects from './pages/Subjects'
 import API from './api/axios'
 
 const menuGroups = [
@@ -455,6 +456,8 @@ function App() {
           <Classes />
         ) : activeMenu === 'Sections' ? (
           <Sections />
+        ) : activeMenu === 'Subjects' ? (
+          <Subjects />
         ) : (
 
           <div className="dashboard-content">
