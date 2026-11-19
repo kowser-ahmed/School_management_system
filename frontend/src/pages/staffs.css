@@ -1,0 +1,368 @@
+
+/* Main Staff Page */
+.staff-page {
+  padding: 25px;
+  width: 100%;
+  box-sizing: border-box;
+  color: #1f2937;
+}
+
+.staff-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.staff-page-header h1 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.staff-page-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Add Staff Button */
+.staff-add-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.staff-add-btn:hover {
+  background: #1d4ed8;
+}
+
+.staff-add-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Alert Messages */
+.staff-alert {
+  padding: 13px 16px;
+  border-radius: 7px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.staff-alert.error {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.staff-alert.success {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+/* Form Card */
+.staff-form-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.staff-form-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.staff-form-heading h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #1e293b;
+}
+
+.staff-form-heading button {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.staff-form-heading button:hover {
+  color: #dc2626;
+}
+
+/* Form Grid */
+.staff-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.staff-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.staff-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.staff-field input,
+.staff-field select,
+.staff-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+  background: #fff;
+  color: #1e293b;
+  font-size: 14px;
+  font-family: inherit;
+  transition: 0.2s;
+}
+
+.staff-field input:focus,
+.staff-field select:focus,
+.staff-field textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.staff-field input.input-error {
+  border-color: #dc2626;
+}
+
+.staff-field-error {
+  color: #dc2626;
+  font-size: 12px;
+}
+
+/* Form Actions */
+.staff-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.staff-cancel-btn,
+.staff-save-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.staff-cancel-btn {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.staff-cancel-btn:hover {
+  background: #cbd5e1;
+}
+
+.staff-save-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.staff-save-btn:hover {
+  background: #1d4ed8;
+}
+
+.staff-cancel-btn:disabled,
+.staff-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Staff List Card */
+.staff-list-card {
+  background: #fff;
+  padding: 22px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.staff-list-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.staff-list-heading h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: #1e293b;
+}
+
+.staff-list-heading p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.staff-search {
+  width: 260px;
+  max-width: 100%;
+  padding: 10px 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+}
+
+.staff-search:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Staff Table */
+.staff-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.staff-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+  text-align: left;
+}
+
+.staff-table th,
+.staff-table td {
+  padding: 13px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.staff-table th {
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 700;
+}
+
+.staff-table td {
+  color: #475569;
+}
+
+.staff-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* Action Buttons */
+.staff-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.staff-edit-btn,
+.staff-delete-btn {
+  padding: 7px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.staff-edit-btn {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.staff-edit-btn:hover {
+  background: #bfdbfe;
+}
+
+.staff-delete-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.staff-delete-btn:hover {
+  background: #fecaca;
+}
+
+/* Empty and Loading Message */
+.staff-empty {
+  padding: 35px 15px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .staff-page {
+    padding: 15px;
+  }
+
+  .staff-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .staff-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .staff-list-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .staff-search {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .staff-form-card,
+  .staff-list-card {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .staff-page-header h1 {
+    font-size: 23px;
+  }
+
+  .staff-form-actions {
+    flex-direction: column;
+  }
+
+  .staff-cancel-btn,
+  .staff-save-btn {
+    width: 100%;
+  }
+}
