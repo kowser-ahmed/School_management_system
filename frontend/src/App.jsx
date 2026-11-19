@@ -12,9 +12,16 @@ import API from './api/axios'
 import Login from './pages/Login'
 import Users from './pages/Users'
 import ChangePassword from './pages/ChangePassword'
-import Accounts from './pages/Accounts'
+import Examinations from './pages/Examinations'
+import ExamSchedule from './pages/ExamSchedule'
+import MarksEntry from './pages/MarksEntry'
+import GradeGPA from './pages/GradeGPA'
+import ResultPublication from './pages/ResultPublication'
+import StudentResult from './pages/StudentResult'
 import StudentAttendance from './pages/StudentAttendance'
+import Accounts from './pages/Accounts'
 import TeacherAssignment from './pages/TeacherAssignment'
+import Results from './pages/Results'
 
 // ================= MENU CONFIGURATION =================
 
@@ -37,7 +44,12 @@ const roleMenuGroups = {
       items: [
         { name: 'Attendance', icon: '✓' },
         { name: 'Examinations', icon: '▤' },
-        { name: 'Results', icon: '▥' }
+        { name: 'Exam Schedule', icon: '📅' },
+        { name: 'Marks Entry', icon: '✍' },
+        { name: 'Grade & GPA', icon: '📊' },
+        { name: 'Results', icon: '▥' },
+        { name: 'Result Publication', icon: '📢' },
+        { name: 'Student Result', icon: '🎓' },
       ]
     },
     {
@@ -784,14 +796,36 @@ function App() {
         ) : activeMenu === 'Subjects' ? (
 
           <Subjects />
-          ) : activeMenu === 'Attendance' ? (
+        ) : activeMenu === 'Examinations' ? (
 
-  <StudentAttendance userRole={userRole} />
+          <Examinations />
+        ) : activeMenu === 'Exam Schedule' ? (
+
+          <ExamSchedule />
+        ) : activeMenu === 'Marks Entry' ? (
+
+          <MarksEntry />
+        ) : activeMenu === 'Grade & GPA' ? (
+
+          <GradeGPA />
+        ) : activeMenu === 'Results' ? (
+
+         <Results />
+        ) : activeMenu === 'Result Publication' ? (
+
+          <ResultPublication />
+        ) : activeMenu === 'Student Result' ? (
+
+        <StudentResult />
+
+        ) : activeMenu === 'Attendance' ? (
+
+          <StudentAttendance userRole={userRole} />
 
         ) : activeMenu === 'Fees & Accounts' ? (
 
           <Accounts user={user} />
-
+        
         ) : activeMenu === 'User Management' ? (
 
           <Users />
