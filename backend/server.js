@@ -9,6 +9,7 @@ require("dotenv").config({
 });
 
 const db = require("./config/db");
+
 const studentRoutes = require("./routes/studentRoutes");
 const classRoutes = require("./routes/classRoutes");
 const sectionRoutes = require("./routes/sectionRoutes");
@@ -23,14 +24,20 @@ const examScheduleRoutes = require("./routes/examScheduleRoutes");
 const resultRoutes = require("./routes/resultRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const teacherAssignmentRoutes = require("./routes/teacherAssignmentRoutes");
+
+// Leave Management routes
 const leaveRoutes = require("./routes/leaveRoutes");
+
+// Main branch routes
+const noticeRoutes = require("./routes/noticeRoutes");
+const holidayRoutes = require("./routes/holidayRoutes");
+const routineRoutes = require("./routes/routineRoutes");
+const admissionRoutes = require("./routes/admissionRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/api/auth", authRoutes);
-
 
 // Test backend
 app.get("/", (req, res) => {
@@ -60,7 +67,7 @@ app.get("/api/test-db", async (req, res) => {
     }
 });
 
-// Student routes
+// Test validation
 app.post("/api/test-validation", (req, res) => {
     console.log("TEST VALIDATION ROUTE HIT");
     console.log("Received body:", req.body);
@@ -71,6 +78,7 @@ app.post("/api/test-validation", (req, res) => {
     });
 });
 
+// API routes
 app.use("/api/students", studentRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/sections", sectionRoutes);
@@ -83,11 +91,17 @@ app.use("/api/results", resultRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/teacher-assignments", teacherAssignmentRoutes);
 app.use("/api/accounts", accountsRoutes);
-app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/attendance", attendanceRoutes);
-app.use("/api/teacher-assignments", teacherAssignmentRoutes);
+app.use("/api/auth", authRoutes);
+
+// Leave Management
 app.use("/api/leaves", leaveRoutes);
+
+// Main branch modules
+app.use("/api/notices", noticeRoutes);
+app.use("/api/holidays", holidayRoutes);
+app.use("/api/routines", routineRoutes);
+app.use("/api/admissions", admissionRoutes);
 
 const PORT = process.env.PORT || 5000;
 

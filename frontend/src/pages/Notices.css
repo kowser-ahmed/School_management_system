@@ -1,0 +1,350 @@
+
+/* ================= NOTICE HEADING ================= */
+
+.notice-heading,
+.notice-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ================= NOTICE LIST ================= */
+
+.notice-list-card {
+  margin-bottom: 22px;
+}
+
+.notice-table-header {
+  margin-bottom: 18px;
+}
+
+.notice-table-header h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.notice-table-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.notice-search {
+  width: 100%;
+  max-width: 260px;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  outline: none;
+  background: white;
+  color: #111827;
+}
+
+.notice-search:focus {
+  border-color: #2563eb;
+}
+
+.notice-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 750px;
+}
+
+.notice-table th,
+.notice-table td {
+  padding: 13px 15px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notice-table th {
+  background: #f9fafb;
+  color: #374151;
+  font-size: 14px;
+}
+
+.notice-table td {
+  color: #374151;
+}
+
+.notice-title-cell {
+  min-width: 140px;
+  font-weight: 600;
+}
+
+.notice-content-cell {
+  min-width: 220px;
+  max-width: 350px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ================= STATUS ================= */
+
+.notice-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.notice-status.published {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.notice-status.draft {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* ================= MESSAGES ================= */
+
+.notice-message {
+  padding: 22px 10px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.notice-error {
+  color: #b91c1c;
+}
+
+.notice-error button {
+  margin-left: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* ================= ACTION BUTTON ================= */
+
+.notice-action-button {
+  border: none;
+  border-radius: 7px;
+  padding: 11px 17px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.notice-action-button:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.notice-action-button:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ================= ROW ACTIONS ================= */
+
+.notice-row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.notice-edit-button,
+.notice-delete-button {
+  border: none;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.notice-edit-button {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.notice-edit-button:hover {
+  background: #bfdbfe;
+}
+
+.notice-delete-button {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.notice-delete-button:hover {
+  background: #fecaca;
+}
+
+.notice-cancel-button {
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  padding: 10px 16px;
+  background: #ffffff;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.notice-cancel-button:hover {
+  background: #f3f4f6;
+}
+
+/* ================= FORM MODAL ================= */
+
+.notice-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: rgba(17, 24, 39, 0.55);
+}
+
+.notice-modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+}
+
+.notice-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.notice-modal-header h3 {
+  margin: 0;
+  color: #111827;
+}
+
+.notice-modal-close {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 27px;
+  cursor: pointer;
+}
+
+.notice-modal-close:hover {
+  color: #111827;
+}
+
+/* ================= FORM FIELDS ================= */
+
+.notice-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+.notice-form-group label {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.notice-form-group input,
+.notice-form-group select,
+.notice-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  outline: none;
+  background: #ffffff;
+  color: #111827;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.notice-form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.notice-form-group input:focus,
+.notice-form-group select:focus,
+.notice-form-group textarea:focus {
+  border-color: #2563eb;
+}
+
+.notice-modal .notice-error {
+  margin: 10px 0;
+  text-align: left;
+}
+
+/* ================= FORM ACTIONS ================= */
+
+.notice-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.notice-form-actions button {
+  min-width: 90px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 650px) {
+  .notice-heading {
+    align-items: flex-start;
+  }
+
+  .notice-table-header {
+    align-items: stretch;
+  }
+
+  .notice-search {
+    max-width: 100%;
+  }
+
+  .notice-action-button {
+    width: 100%;
+  }
+
+  .notice-row-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .notice-edit-button,
+  .notice-delete-button {
+    width: 100%;
+  }
+
+  .notice-modal {
+    padding: 18px;
+  }
+
+  .notice-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .notice-form-actions button {
+    width: 100%;
+  }
+}
