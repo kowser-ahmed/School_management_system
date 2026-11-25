@@ -22,9 +22,10 @@ import StudentAttendance from './pages/StudentAttendance'
 import Accounts from './pages/Accounts'
 import TeacherAssignment from './pages/TeacherAssignment'
 import Results from './pages/Results'
-import Routine from './pages/Routine'
-import Admission from './pages/Admission'
-
+import Notices from './pages/Notices';
+import Holidays from './pages/Holidays';
+import Routine from './pages/Routine';
+import Admission from './pages/Admission';
 
 // ================= MENU CONFIGURATION =================
 
@@ -64,7 +65,9 @@ const roleMenuGroups = {
         { name: 'Fees & Accounts', icon: '৳' },
         { name: 'Online Admission', icon: '📝' },
         { name: 'Change Password', icon: '🔐' },
-        { name: 'Settings', icon: '⚙' }
+        { name: 'Settings', icon: '⚙' },
+        { name: 'Notices', icon: '📢' },
+        { name: 'Holidays', icon: '📅' } 
       ]
     }
   ],
@@ -78,7 +81,9 @@ const roleMenuGroups = {
         { name: 'Teachers', icon: '♙' },
         { name: 'Classes', icon: '▤' },
         { name: 'Sections', icon: '▣' },
-        { name: 'Subjects', icon: '▧' }
+        { name: 'Subjects', icon: '▧' },
+         { name: 'Notices', icon: '📢' },
+         { name: 'Holidays', icon: '📅' } 
       ]
     },
     {
@@ -103,7 +108,9 @@ const roleMenuGroups = {
       title: 'MAIN MENU',
       items: [
         { name: 'Dashboard', icon: '▦' },
-        { name: 'Fees & Accounts', icon: '৳' }
+        { name: 'Fees & Accounts', icon: '৳' },
+        { name: 'Notices', icon: '📢' },
+        { name: 'Holidays', icon: '📅' }
       ]
     },
     {
@@ -120,7 +127,9 @@ const roleMenuGroups = {
       items: [
         { name: 'Dashboard', icon: '▦' },
         { name: 'Attendance', icon: '✓' },
-        { name: 'Results', icon: '▥' }
+        { name: 'Results', icon: '▥' }, 
+        { name: 'Notices', icon: '📢' },
+        { name: 'Holidays', icon: '📅' }
       ]
     },
     {
@@ -139,7 +148,9 @@ const roleMenuGroups = {
         { name: 'Attendance', icon: '✓' },
         { name: 'Class Routine', icon: '📅' },
         { name: 'Results', icon: '▥' },
-        { name: 'Fees & Accounts', icon: '৳' }
+        { name: 'Fees & Accounts', icon: '৳' },
+        { name: 'Notices', icon: '📢' },
+        { name: 'Holidays', icon: '📅' } 
       ]
     },
     {
@@ -835,9 +846,17 @@ function App() {
         ) : activeMenu === 'Attendance' ? (
 
           <StudentAttendance userRole={userRole} />
-        ) : activeMenu === 'Class Routine' ? (
+) : activeMenu === 'Notices' ? (
 
-          <Routine userRole={userRole} />
+    <Notices user={user} />
+
+) : activeMenu === 'Holidays' ? (
+
+    <Holidays user={user || { role: userRole }} />
+
+) : activeMenu === 'Class Routine' ? (
+
+    <Routine userRole={userRole} />
 
         ) : activeMenu === 'Fees & Accounts' ? (
 

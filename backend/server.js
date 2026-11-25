@@ -22,9 +22,10 @@ const examScheduleRoutes = require("./routes/examScheduleRoutes");
 const resultRoutes = require("./routes/resultRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const teacherAssignmentRoutes = require("./routes/teacherAssignmentRoutes");
+const noticeRoutes = require("./routes/noticeRoutes");
+const holidayRoutes = require("./routes/holidayRoutes");
 const routineRoutes = require("./routes/routineRoutes");
 const admissionRoutes = require("./routes/admissionRoutes");
-
 const app = express();
 
 app.use(cors());
@@ -88,6 +89,11 @@ app.use("/api/accounts", accountsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/teacher-assignments", teacherAssignmentRoutes);
+app.use("/api/notices", noticeRoutes);
+app.use("/api/holidays", holidayRoutes);
+app.use("/api/routines", routineRoutes);
+app.use("/api/admissions", admissionRoutes);
 
 const PORT = process.env.PORT || 5000;
 
