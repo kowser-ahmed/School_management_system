@@ -22,6 +22,8 @@ const examScheduleRoutes = require("./routes/examScheduleRoutes");
 const resultRoutes = require("./routes/resultRoutes");
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const teacherAssignmentRoutes = require("./routes/teacherAssignmentRoutes");
+const routineRoutes = require("./routes/routineRoutes");
+const admissionRoutes = require("./routes/admissionRoutes");
 
 const app = express();
 
@@ -80,11 +82,12 @@ app.use("/api/exam-schedules", examScheduleRoutes);
 app.use("/api/results", resultRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/teacher-assignments", teacherAssignmentRoutes);
+app.use("/api/routines", routineRoutes);
+app.use("/api/admissions", admissionRoutes);
 app.use("/api/accounts", accountsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/attendance", attendanceRoutes);
-app.use("/api/teacher-assignments", teacherAssignmentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
