@@ -8,6 +8,8 @@ const permissions = {
         "classes:read",
         "sections:read",
         "subjects:read",
+        "notices:read",
+        "holidays:read",
 
         // Attendance permissions
         "attendance:read",
@@ -24,7 +26,9 @@ const permissions = {
         "results:read",
         "results:create",
         "results:update",
-        "results:delete"
+        "results:delete",
+
+       
         
     ],
 
@@ -62,7 +66,11 @@ accountant: [
     // Payslips
     "payslips:read",
     "payslips:create",
-    "payslips:pay"
+    "payslips:pay",
+    // Notices
+    "notices:read",
+    // Holidays
+    "holidays:read"
 ],
 
 
@@ -70,7 +78,9 @@ accountant: [
         "children:read",
         "attendance:read",
         "results:read",
-        "fees:read"
+        "fees:read",
+        "notices:read",
+        "holidays:read"
     ],
 
     student: [
@@ -80,7 +90,9 @@ accountant: [
         "fees:read" ,
         "student:fees:read",
         "student:dues:read",
-        "student:payments:read"
+        "student:payments:read",
+        "notices:read",
+        "holidays:read"
         
     ]
 };

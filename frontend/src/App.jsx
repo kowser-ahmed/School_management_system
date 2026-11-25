@@ -22,6 +22,8 @@ import StudentAttendance from './pages/StudentAttendance'
 import Accounts from './pages/Accounts'
 import TeacherAssignment from './pages/TeacherAssignment'
 import Results from './pages/Results'
+import Notices from './pages/Notices'
+import Holidays from './pages/Holidays';
 
 // ================= MENU CONFIGURATION =================
 
@@ -59,7 +61,9 @@ const roleMenuGroups = {
         { name: 'User Management', icon: '♙' },
         { name: 'Fees & Accounts', icon: '৳' },
         { name: 'Change Password', icon: '🔐' },
-        { name: 'Settings', icon: '⚙' }
+        { name: 'Settings', icon: '⚙' },
+        { name: 'Notices', icon: '📢' },
+        { name: 'Holidays', icon: '📅' } 
       ]
     }
   ],
@@ -73,7 +77,9 @@ const roleMenuGroups = {
         { name: 'Teachers', icon: '♙' },
         { name: 'Classes', icon: '▤' },
         { name: 'Sections', icon: '▣' },
-        { name: 'Subjects', icon: '▧' }
+        { name: 'Subjects', icon: '▧' },
+         { name: 'Notices', icon: '📢' },
+         { name: 'Holidays', icon: '📅' } 
       ]
     },
     {
@@ -97,7 +103,9 @@ const roleMenuGroups = {
       title: 'MAIN MENU',
       items: [
         { name: 'Dashboard', icon: '▦' },
-        { name: 'Fees & Accounts', icon: '৳' }
+        { name: 'Fees & Accounts', icon: '৳' },
+        { name: 'Notices', icon: '📢' },
+        { name: 'Holidays', icon: '📅' }
       ]
     },
     {
@@ -114,7 +122,9 @@ const roleMenuGroups = {
       items: [
         { name: 'Dashboard', icon: '▦' },
         { name: 'Attendance', icon: '✓' },
-        { name: 'Results', icon: '▥' }
+        { name: 'Results', icon: '▥' }, 
+        { name: 'Notices', icon: '📢' },
+        { name: 'Holidays', icon: '📅' }
       ]
     },
     {
@@ -132,7 +142,9 @@ const roleMenuGroups = {
         { name: 'Dashboard', icon: '▦' },
         { name: 'Attendance', icon: '✓' },
         { name: 'Results', icon: '▥' },
-        { name: 'Fees & Accounts', icon: '৳' }
+        { name: 'Fees & Accounts', icon: '৳' },
+        { name: 'Notices', icon: '📢' },
+        { name: 'Holidays', icon: '📅' } 
       ]
     },
     {
@@ -828,6 +840,14 @@ function App() {
         ) : activeMenu === 'Attendance' ? (
 
           <StudentAttendance userRole={userRole} />
+        
+        ) : activeMenu === 'Notices' ? (
+
+           <Notices user={user} />  
+
+        ) : activeMenu === 'Holidays' ? (
+
+          <Holidays user={user || { role: userRole }} />   
 
         ) : activeMenu === 'Fees & Accounts' ? (
 
