@@ -7,8 +7,16 @@ const allowedRoles = [
     "teacher",
     "accountant",
     "parent",
-    "student"
+    "student",
+    "staff"
 ];
+
+// Normalize role safely
+const normalizeRole = (role) => {
+    return typeof role === "string"
+        ? role.trim().toLowerCase()
+        : "";
+};
 
 // Handle model errors
 const handleModelError = (res, error, action) => {
@@ -21,31 +29,39 @@ const handleModelError = (res, error, action) => {
         });
     }
 
-    if (error.message === "TEACHER_NOT_FOUND") {
-        return res.status(404).json({
-            success: false,
+    const modelErrors = {
+        TEACHER_NOT_FOUND: {
+            status: 404,
             message: "Selected teacher profile not found."
-        });
-    }
-
-    if (error.message === "TEACHER_ALREADY_LINKED") {
-        return res.status(409).json({
-            success: false,
+        },
+        TEACHER_ALREADY_LINKED: {
+            status: 409,
             message: "This teacher profile is already linked to another account."
-        });
-    }
-
-    if (error.message === "STUDENT_NOT_FOUND") {
-        return res.status(404).json({
-            success: false,
+        },
+        STUDENT_NOT_FOUND: {
+            status: 404,
             message: "Selected student profile not found."
-        });
-    }
-
-    if (error.message === "STUDENT_ALREADY_LINKED") {
-        return res.status(409).json({
-            success: false,
+        },
+        STUDENT_ALREADY_LINKED: {
+            status: 409,
             message: "This student profile is already linked to another account."
+        },
+        STAFF_NOT_FOUND: {
+            status: 404,
+            message: "Selected staff profile not found."
+        },
+        STAFF_ALREADY_LINKED: {
+            status: 409,
+            message: "This staff profile is already linked to another account."
+        }
+    };
+
+    const modelError = modelErrors[error.message];
+
+    if (modelError) {
+        return res.status(modelError.status).json({
+            success: false,
+            message: modelError.message
         });
     }
 
@@ -53,6 +69,11 @@ const handleModelError = (res, error, action) => {
         success: false,
         message: `Failed to ${action.toLowerCase()}.`
     });
+};
+
+// Validate profile ID
+const isValidProfileId = (id) => {
+    return Number.isInteger(Number(id)) && Number(id) > 0;
 };
 
 // Get all users
@@ -97,11 +118,17 @@ const createUser = async (req, res) => {
             full_name,
             email,
             password,
-            role,
             phone,
             teacher_id,
-            student_id
+            student_id,
+            staff_id
         } = req.body;
+
+        const role = normalizeRole(req.body.role);
+
+        // Diagnostic log
+        console.log("CREATE USER ROLE:", JSON.stringify(req.body.role));
+        console.log("NORMALIZED ROLE:", JSON.stringify(role));
 
         if (!full_name || !email || !password || !role) {
             return res.status(400).json({
@@ -124,23 +151,24 @@ const createUser = async (req, res) => {
             });
         }
 
-        if (
-            role === "teacher" &&
-            (!Number.isInteger(Number(teacher_id)) || Number(teacher_id) <= 0)
-        ) {
+        if (role === "teacher" && !isValidProfileId(teacher_id)) {
             return res.status(400).json({
                 success: false,
                 message: "Please select a teacher profile."
             });
         }
 
-        if (
-            role === "student" &&
-            (!Number.isInteger(Number(student_id)) || Number(student_id) <= 0)
-        ) {
+        if (role === "student" && !isValidProfileId(student_id)) {
             return res.status(400).json({
                 success: false,
                 message: "Please select a student profile."
+            });
+        }
+
+        if (role === "staff" && !isValidProfileId(staff_id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please select a staff profile."
             });
         }
 
@@ -153,7 +181,8 @@ const createUser = async (req, res) => {
             role,
             phone,
             teacher_id: role === "teacher" ? Number(teacher_id) : null,
-            student_id: role === "student" ? Number(student_id) : null
+            student_id: role === "student" ? Number(student_id) : null,
+            staff_id: role === "staff" ? Number(staff_id) : null
         });
 
         res.status(201).json({
@@ -162,7 +191,9 @@ const createUser = async (req, res) => {
                 ? "Teacher account created and profile linked successfully."
                 : role === "student"
                     ? "Student account created and profile linked successfully."
-                    : "User created successfully.",
+                    : role === "staff"
+                        ? "Staff account created and profile linked successfully."
+                        : "User created successfully.",
             user_id: userId
         });
 
@@ -177,12 +208,18 @@ const updateUser = async (req, res) => {
         const {
             full_name,
             email,
-            role,
             phone,
             status,
             teacher_id,
-            student_id
+            student_id,
+            staff_id
         } = req.body;
+
+        const role = normalizeRole(req.body.role);
+
+        // Diagnostic log
+        console.log("UPDATE USER ROLE:", JSON.stringify(req.body.role));
+        console.log("NORMALIZED ROLE:", JSON.stringify(role));
 
         if (!full_name || !email || !role || !status) {
             return res.status(400).json({
@@ -205,23 +242,24 @@ const updateUser = async (req, res) => {
             });
         }
 
-        if (
-            role === "teacher" &&
-            (!Number.isInteger(Number(teacher_id)) || Number(teacher_id) <= 0)
-        ) {
+        if (role === "teacher" && !isValidProfileId(teacher_id)) {
             return res.status(400).json({
                 success: false,
                 message: "Please select a teacher profile."
             });
         }
 
-        if (
-            role === "student" &&
-            (!Number.isInteger(Number(student_id)) || Number(student_id) <= 0)
-        ) {
+        if (role === "student" && !isValidProfileId(student_id)) {
             return res.status(400).json({
                 success: false,
                 message: "Please select a student profile."
+            });
+        }
+
+        if (role === "staff" && !isValidProfileId(staff_id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please select a staff profile."
             });
         }
 
@@ -234,7 +272,8 @@ const updateUser = async (req, res) => {
                 phone,
                 status,
                 teacher_id: role === "teacher" ? Number(teacher_id) : null,
-                student_id: role === "student" ? Number(student_id) : null
+                student_id: role === "student" ? Number(student_id) : null,
+                staff_id: role === "staff" ? Number(staff_id) : null
             }
         );
 
