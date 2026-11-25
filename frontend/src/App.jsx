@@ -22,8 +22,10 @@ import StudentAttendance from './pages/StudentAttendance'
 import Accounts from './pages/Accounts'
 import TeacherAssignment from './pages/TeacherAssignment'
 import Results from './pages/Results'
-import Notices from './pages/Notices'
+import Notices from './pages/Notices';
 import Holidays from './pages/Holidays';
+import Routine from './pages/Routine';
+import Admission from './pages/Admission';
 
 // ================= MENU CONFIGURATION =================
 
@@ -46,6 +48,7 @@ const roleMenuGroups = {
       title: 'ACADEMIC',
       items: [
         { name: 'Attendance', icon: '✓' },
+        { name: 'Class Routine', icon: '📅' },
         { name: 'Examinations', icon: '▤' },
         { name: 'Exam Schedule', icon: '📅' },
         { name: 'Marks Entry', icon: '✍' },
@@ -60,6 +63,7 @@ const roleMenuGroups = {
       items: [
         { name: 'User Management', icon: '♙' },
         { name: 'Fees & Accounts', icon: '৳' },
+        { name: 'Online Admission', icon: '📝' },
         { name: 'Change Password', icon: '🔐' },
         { name: 'Settings', icon: '⚙' },
         { name: 'Notices', icon: '📢' },
@@ -86,6 +90,7 @@ const roleMenuGroups = {
       title: 'ACADEMIC',
       items: [
         { name: 'Attendance', icon: '✓' },
+        { name: 'Class Routine', icon: '📅' },
         { name: 'Examinations', icon: '▤' },
         { name: 'Results', icon: '▥' }
       ]
@@ -141,6 +146,7 @@ const roleMenuGroups = {
       items: [
         { name: 'Dashboard', icon: '▦' },
         { name: 'Attendance', icon: '✓' },
+        { name: 'Class Routine', icon: '📅' },
         { name: 'Results', icon: '▥' },
         { name: 'Fees & Accounts', icon: '৳' },
         { name: 'Notices', icon: '📢' },
@@ -840,23 +846,29 @@ function App() {
         ) : activeMenu === 'Attendance' ? (
 
           <StudentAttendance userRole={userRole} />
-        
-        ) : activeMenu === 'Notices' ? (
+) : activeMenu === 'Notices' ? (
 
-           <Notices user={user} />  
+    <Notices user={user} />
 
-        ) : activeMenu === 'Holidays' ? (
+) : activeMenu === 'Holidays' ? (
 
-          <Holidays user={user || { role: userRole }} />   
+    <Holidays user={user || { role: userRole }} />
+
+) : activeMenu === 'Class Routine' ? (
+
+    <Routine userRole={userRole} />
 
         ) : activeMenu === 'Fees & Accounts' ? (
 
           <Accounts user={user} />
+        ) : activeMenu === 'Online Admission' ? (
+
+          
+          <Admission />
         
         ) : activeMenu === 'User Management' ? (
 
           <Users />
-
         ) : activeMenu === 'Change Password' ? (
 
           <ChangePassword onLogout={handleLogout} />
