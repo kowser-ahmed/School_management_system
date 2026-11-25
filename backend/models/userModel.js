@@ -13,10 +13,12 @@ const getAllUsers = async () => {
             u.status,
             u.created_at,
             t.teacher_id,
-            s.student_id
+            s.student_id,
+            st.staff_id
         FROM users u
         LEFT JOIN teachers t ON t.user_id = u.user_id
         LEFT JOIN students s ON s.user_id = u.user_id
+        LEFT JOIN staff st ON st.user_id = u.user_id
         ORDER BY u.user_id DESC
     `);
 
@@ -35,10 +37,12 @@ const getUserById = async (userId) => {
             u.status,
             u.created_at,
             t.teacher_id,
-            s.student_id
+            s.student_id,
+            st.staff_id
         FROM users u
         LEFT JOIN teachers t ON t.user_id = u.user_id
         LEFT JOIN students s ON s.user_id = u.user_id
+        LEFT JOIN staff st ON st.user_id = u.user_id
         WHERE u.user_id = ?
     `, [userId]);
 
@@ -97,6 +101,35 @@ const linkStudent = async (connection, studentId, userId) => {
     );
 };
 
+// Link staff profile
+const linkStaff = async (connection, staffId, userId) => {
+    const [staffMembers] = await connection.query(
+        `SELECT staff_id, user_id
+         FROM staff
+         WHERE staff_id = ?
+         FOR UPDATE`,
+        [staffId]
+    );
+
+    if (!staffMembers.length) {
+        throw new Error("STAFF_NOT_FOUND");
+    }
+
+    const staffMember = staffMembers[0];
+
+    if (
+        staffMember.user_id &&
+        Number(staffMember.user_id) !== Number(userId)
+    ) {
+        throw new Error("STAFF_ALREADY_LINKED");
+    }
+
+    await connection.query(
+        "UPDATE staff SET user_id = ? WHERE staff_id = ?",
+        [userId, staffId]
+    );
+};
+
 // Create user
 const createUser = async (userData) => {
     const connection = await db.getConnection();
@@ -111,7 +144,8 @@ const createUser = async (userData) => {
             role,
             phone,
             teacher_id,
-            student_id
+            student_id,
+            staff_id
         } = userData;
 
         const [result] = await connection.query(
@@ -129,6 +163,10 @@ const createUser = async (userData) => {
 
         if (role === "student") {
             await linkStudent(connection, student_id, userId);
+        }
+
+        if (role === "staff") {
+            await linkStaff(connection, staff_id, userId);
         }
 
         await connection.commit();
@@ -157,7 +195,8 @@ const updateUser = async (userId, userData) => {
             phone,
             status,
             teacher_id,
-            student_id
+            student_id,
+            staff_id
         } = userData;
 
         const [existingUsers] = await connection.query(
@@ -189,6 +228,12 @@ const updateUser = async (userId, userData) => {
             [userId]
         );
 
+        // Remove previous staff link
+        await connection.query(
+            "UPDATE staff SET user_id = NULL WHERE user_id = ?",
+            [userId]
+        );
+
         // Link selected teacher
         if (role === "teacher") {
             await linkTeacher(connection, teacher_id, userId);
@@ -197,6 +242,11 @@ const updateUser = async (userId, userData) => {
         // Link selected student
         if (role === "student") {
             await linkStudent(connection, student_id, userId);
+        }
+
+        // Link selected staff
+        if (role === "staff") {
+            await linkStaff(connection, staff_id, userId);
         }
 
         await connection.commit();
@@ -225,6 +275,11 @@ const deleteUser = async (userId) => {
 
         await connection.query(
             "UPDATE students SET user_id = NULL WHERE user_id = ?",
+            [userId]
+        );
+
+        await connection.query(
+            "UPDATE staff SET user_id = NULL WHERE user_id = ?",
             [userId]
         );
 

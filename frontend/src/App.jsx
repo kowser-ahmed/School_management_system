@@ -22,6 +22,7 @@ import StudentAttendance from './pages/StudentAttendance'
 import Accounts from './pages/Accounts'
 import TeacherAssignment from './pages/TeacherAssignment'
 import Results from './pages/Results'
+import Leave from './pages/Leave'
 
 // ================= MENU CONFIGURATION =================
 
@@ -50,7 +51,7 @@ const roleMenuGroups = {
         { name: 'Grade & GPA', icon: '📊' },
         { name: 'Results', icon: '▥' },
         { name: 'Result Publication', icon: '📢' },
-        { name: 'Student Result', icon: '🎓' },
+        { name: 'Student Result', icon: '🎓' }
       ]
     },
     {
@@ -58,6 +59,7 @@ const roleMenuGroups = {
       items: [
         { name: 'User Management', icon: '♙' },
         { name: 'Fees & Accounts', icon: '৳' },
+        { name: 'Leave Management', icon: '📝' },
         { name: 'Change Password', icon: '🔐' },
         { name: 'Settings', icon: '⚙' }
       ]
@@ -87,6 +89,24 @@ const roleMenuGroups = {
     {
       title: 'ACCOUNT',
       items: [
+        { name: 'Leave Management', icon: '📝' },
+        { name: 'Change Password', icon: '🔐' }
+      ]
+    }
+  ],
+
+  // STAFF MENU
+  staff: [
+    {
+      title: 'MAIN MENU',
+      items: [
+        { name: 'Dashboard', icon: '▦' }
+      ]
+    },
+    {
+      title: 'ACCOUNT',
+      items: [
+        { name: 'Leave Management', icon: '📝' },
         { name: 'Change Password', icon: '🔐' }
       ]
     }
@@ -453,327 +473,444 @@ function App() {
 
         </header>
 
-        {/* DASHBOARD */}
+        {/* ================= DASHBOARD ================= */}
 
         {activeMenu === 'Dashboard' ? (
 
-          <div className="dashboard-content">
+          // ================= STAFF DASHBOARD =================
 
-            {/* WELCOME SECTION */}
+          userRole === 'staff' ? (
 
-            <section className="welcome-banner">
+            <div className="dashboard-content">
 
-              <div className="welcome-text">
+              <section className="welcome-banner">
 
-                <span className="welcome-label">
-                  {displayRole.toUpperCase()} DASHBOARD
-                </span>
+                <div className="welcome-text">
 
-                <h1>Welcome back, {user?.full_name}!</h1>
+                  <span className="welcome-label">
+                    STAFF DASHBOARD
+                  </span>
 
-                <p>
-                  Here's what's happening at your school.
-                  Manage everything from one place.
-                </p>
+                  <h1>Welcome back, {user?.full_name}!</h1>
 
-                {allowedMenus.includes('Students') && (
+                  <p>
+                    Welcome to your personal staff dashboard.
+                    Manage your account and view your information.
+                  </p>
+
                   <button
                     className="welcome-button"
-                    onClick={() => openPage('Students')}
+                    onClick={() => openPage('Change Password')}
                   >
-                    Manage Students <span>→</span>
+                    Change Password <span>→</span>
                   </button>
-                )}
 
-                {userRole === 'accountant' && (
-                  <button
-                    className="welcome-button"
-                    onClick={() => openPage('Fees & Accounts')}
-                  >
-                    Manage Accounts <span>→</span>
-                  </button>
-                )}
-
-              </div>
-
-              <div className="welcome-decoration">
-                <div className="decoration-circle circle-one"></div>
-                <div className="decoration-circle circle-two"></div>
-                <div className="welcome-building">🏫</div>
-              </div>
-
-            </section>
-
-            {/* OVERVIEW HEADING */}
-
-            {canViewAcademicStats && (
-              <div className="dashboard-section-heading">
-
-                <div>
-                  <h2>School Overview</h2>
-                  <p>A quick look at your school's key statistics</p>
                 </div>
 
-                <span className="overview-badge">
-                  <span className="online-dot"></span>
-                  Live overview
-                </span>
-
-              </div>
-            )}
-
-            {/* STATISTICS */}
-
-            {canViewAcademicStats && (
-              <section className="stats-grid">
-
-                {stats.map((stat) => (
-                  <div className="stat-card" key={stat.title}>
-
-                    <div className="stat-card-top">
-                      <div className={`stat-icon ${stat.color}`}>
-                        {stat.icon}
-                      </div>
-
-                      <span className="stat-menu">•••</span>
-                    </div>
-
-                    <div className="stat-card-bottom">
-                      <p>{stat.title}</p>
-
-                      <h2>
-                        {loadingStats ? '...' : stat.value}
-                      </h2>
-
-                      <span className="stat-description">
-                        Current registered records
-                      </span>
-                    </div>
-
-                  </div>
-                ))}
+                <div className="welcome-decoration">
+                  <div className="decoration-circle circle-one"></div>
+                  <div className="decoration-circle circle-two"></div>
+                  <div className="welcome-building">👨‍💼</div>
+                </div>
 
               </section>
-            )}
 
-            {/* MAIN DASHBOARD GRID */}
+              <section className="dashboard-main-grid">
 
-            <section className="dashboard-main-grid">
+                {/* MY ACCOUNT INFORMATION */}
 
-              {/* QUICK ACTIONS */}
+                <div className="dashboard-card system-card">
 
-              <div className="dashboard-card quick-actions-card">
-
-                <div className="card-heading">
-                  <div>
-                    <h3>Quick Actions</h3>
-                    <p>Frequently used management tools</p>
+                  <div className="card-heading">
+                    <div>
+                      <h3>My Account Information</h3>
+                      <p>Your personal account details</p>
+                    </div>
                   </div>
+
+                  <div className="system-info-list">
+
+                    <div className="system-info-row">
+                      <span>Full Name</span>
+                      <strong>{user?.full_name || 'Not available'}</strong>
+                    </div>
+
+                    <div className="system-info-row">
+                      <span>Email</span>
+                      <strong>{user?.email || 'Not available'}</strong>
+                    </div>
+
+                    <div className="system-info-row">
+                      <span>Role</span>
+                      <strong>Staff</strong>
+                    </div>
+
+                    <div className="system-info-row">
+                      <span>Account Status</span>
+                      <strong className="active-status">Logged In</strong>
+                    </div>
+
+                  </div>
+
                 </div>
 
-                <div className="quick-actions-grid">
+                {/* ACCOUNT SECURITY */}
 
-                  {[
-                    { name: 'Students', icon: '♟', color: 'blue', description: 'Manage students' },
-                    { name: 'Teachers', icon: '♙', color: 'green', description: 'Manage teachers' },
-                    { name: 'Classes', icon: '▤', color: 'orange', description: 'Manage classes' },
-                    { name: 'Sections', icon: '▣', color: 'purple', description: 'Manage sections' }
-                  ]
-                    .filter(action => allowedMenus.includes(action.name))
-                    .map(action => (
-                      <button
-                        key={action.name}
-                        className="quick-action"
-                        onClick={() => openPage(action.name)}
-                      >
-                        <span className={`quick-action-icon ${action.color}`}>
-                          {action.icon}
-                        </span>
+                <div className="dashboard-card system-card">
 
-                        <span>
-                          <strong>{action.name}</strong>
-                          <small>{action.description}</small>
-                        </span>
+                  <div className="card-heading">
+                    <div>
+                      <h3>Account Security</h3>
+                      <p>Keep your account secure</p>
+                    </div>
+                  </div>
 
-                        <b>→</b>
-                      </button>
-                    ))}
+                  <p>
+                    You can change your password to protect
+                    your personal account.
+                  </p>
+
+                  <button
+                    className="welcome-button"
+                    onClick={() => openPage('Change Password')}
+                  >
+                    Update Password →
+                  </button>
+
+                </div>
+
+              </section>
+
+              <footer className="dashboard-footer">
+                <span>© 2026 EduManage School Management System</span>
+                <span>Staff Portal</span>
+              </footer>
+
+            </div>
+
+          ) : (
+
+            // ================= OTHER ROLE DASHBOARDS =================
+
+            <div className="dashboard-content">
+
+              {/* WELCOME SECTION */}
+
+              <section className="welcome-banner">
+
+                <div className="welcome-text">
+
+                  <span className="welcome-label">
+                    {displayRole.toUpperCase()} DASHBOARD
+                  </span>
+
+                  <h1>Welcome back, {user?.full_name}!</h1>
+
+                  <p>
+                    Here's what's happening at your school.
+                    Manage everything from one place.
+                  </p>
+
+                  {allowedMenus.includes('Students') && (
+                    <button
+                      className="welcome-button"
+                      onClick={() => openPage('Students')}
+                    >
+                      Manage Students <span>→</span>
+                    </button>
+                  )}
 
                   {userRole === 'accountant' && (
                     <button
-                      className="quick-action"
+                      className="welcome-button"
                       onClick={() => openPage('Fees & Accounts')}
                     >
-                      <span className="quick-action-icon orange">৳</span>
-                      <span>
-                        <strong>Fees & Accounts</strong>
-                        <small>Manage accounts</small>
-                      </span>
-                      <b>→</b>
+                      Manage Accounts <span>→</span>
                     </button>
                   )}
 
-                  {userRole === 'student' && (
-                    <button
-                      className="quick-action"
-                      onClick={() => openPage('Fees & Accounts')}
-                    >
-                      <span className="quick-action-icon orange">৳</span>
-                      <span>
-                        <strong>Fees & Accounts</strong>
-                        <small>View your fees and payments</small>
-                      </span>
-                      <b>→</b>
-                    </button>
-                  )}
+                </div>
 
-                  {(userRole === 'parent' || userRole === 'student') && (
-                    <>
+                <div className="welcome-decoration">
+                  <div className="decoration-circle circle-one"></div>
+                  <div className="decoration-circle circle-two"></div>
+                  <div className="welcome-building">🏫</div>
+                </div>
+
+              </section>
+
+              {/* OVERVIEW HEADING */}
+
+              {canViewAcademicStats && (
+                <div className="dashboard-section-heading">
+
+                  <div>
+                    <h2>School Overview</h2>
+                    <p>A quick look at your school's key statistics</p>
+                  </div>
+
+                  <span className="overview-badge">
+                    <span className="online-dot"></span>
+                    Live overview
+                  </span>
+
+                </div>
+              )}
+
+              {/* STATISTICS */}
+
+              {canViewAcademicStats && (
+                <section className="stats-grid">
+
+                  {stats.map((stat) => (
+                    <div className="stat-card" key={stat.title}>
+
+                      <div className="stat-card-top">
+                        <div className={`stat-icon ${stat.color}`}>
+                          {stat.icon}
+                        </div>
+
+                        <span className="stat-menu">•••</span>
+                      </div>
+
+                      <div className="stat-card-bottom">
+                        <p>{stat.title}</p>
+
+                        <h2>
+                          {loadingStats ? '...' : stat.value}
+                        </h2>
+
+                        <span className="stat-description">
+                          Current registered records
+                        </span>
+                      </div>
+
+                    </div>
+                  ))}
+
+                </section>
+              )}
+
+              {/* MAIN DASHBOARD GRID */}
+
+              <section className="dashboard-main-grid">
+
+                {/* QUICK ACTIONS */}
+
+                <div className="dashboard-card quick-actions-card">
+
+                  <div className="card-heading">
+                    <div>
+                      <h3>Quick Actions</h3>
+                      <p>Frequently used management tools</p>
+                    </div>
+                  </div>
+
+                  <div className="quick-actions-grid">
+
+                    {[
+                      { name: 'Students', icon: '♟', color: 'blue', description: 'Manage students' },
+                      { name: 'Teachers', icon: '♙', color: 'green', description: 'Manage teachers' },
+                      { name: 'Classes', icon: '▤', color: 'orange', description: 'Manage classes' },
+                      { name: 'Sections', icon: '▣', color: 'purple', description: 'Manage sections' }
+                    ]
+                      .filter(action => allowedMenus.includes(action.name))
+                      .map(action => (
+                        <button
+                          key={action.name}
+                          className="quick-action"
+                          onClick={() => openPage(action.name)}
+                        >
+                          <span className={`quick-action-icon ${action.color}`}>
+                            {action.icon}
+                          </span>
+
+                          <span>
+                            <strong>{action.name}</strong>
+                            <small>{action.description}</small>
+                          </span>
+
+                          <b>→</b>
+                        </button>
+                      ))}
+
+                    {userRole === 'accountant' && (
                       <button
                         className="quick-action"
-                        onClick={() => openPage('Attendance')}
+                        onClick={() => openPage('Fees & Accounts')}
                       >
-                        <span className="quick-action-icon green">✓</span>
+                        <span className="quick-action-icon orange">৳</span>
                         <span>
-                          <strong>Attendance</strong>
-                          <small>View attendance</small>
+                          <strong>Fees & Accounts</strong>
+                          <small>Manage accounts</small>
                         </span>
                         <b>→</b>
                       </button>
+                    )}
 
+                    {userRole === 'student' && (
                       <button
                         className="quick-action"
-                        onClick={() => openPage('Results')}
+                        onClick={() => openPage('Fees & Accounts')}
                       >
-                        <span className="quick-action-icon purple">▥</span>
+                        <span className="quick-action-icon orange">৳</span>
                         <span>
-                          <strong>Results</strong>
-                          <small>View results</small>
+                          <strong>Fees & Accounts</strong>
+                          <small>View your fees and payments</small>
                         </span>
                         <b>→</b>
                       </button>
-                    </>
-                  )}
+                    )}
 
-                </div>
+                    {(userRole === 'parent' || userRole === 'student') && (
+                      <>
+                        <button
+                          className="quick-action"
+                          onClick={() => openPage('Attendance')}
+                        >
+                          <span className="quick-action-icon green">✓</span>
+                          <span>
+                            <strong>Attendance</strong>
+                            <small>View attendance</small>
+                          </span>
+                          <b>→</b>
+                        </button>
 
-              </div>
+                        <button
+                          className="quick-action"
+                          onClick={() => openPage('Results')}
+                        >
+                          <span className="quick-action-icon purple">▥</span>
+                          <span>
+                            <strong>Results</strong>
+                            <small>View results</small>
+                          </span>
+                          <b>→</b>
+                        </button>
+                      </>
+                    )}
 
-              {/* SYSTEM INFORMATION */}
-
-              <div className="dashboard-card system-card">
-
-                <div className="card-heading">
-                  <div>
-                    <h3>System Information</h3>
-                    <p>Current system details</p>
-                  </div>
-
-                  <span className="system-card-icon">⌘</span>
-                </div>
-
-                <div className="system-info-list">
-
-                  <div className="system-info-row">
-                    <span>Academic Year</span>
-                    <strong>2026</strong>
-                  </div>
-
-                  <div className="system-info-row">
-                    <span>System Status</span>
-                    <strong className="active-status">
-                      <span className="online-dot"></span>
-                      Active
-                    </strong>
-                  </div>
-
-                  <div className="system-info-row">
-                    <span>User Role</span>
-                    <strong>{displayRole}</strong>
-                  </div>
-
-                  <div className="system-info-row">
-                    <span>Platform</span>
-                    <strong>EduManage</strong>
                   </div>
 
                 </div>
 
-              </div>
+                {/* SYSTEM INFORMATION */}
 
-            </section>
+                <div className="dashboard-card system-card">
 
-            {/* BOTTOM DASHBOARD GRID */}
+                  <div className="card-heading">
+                    <div>
+                      <h3>System Information</h3>
+                      <p>Current system details</p>
+                    </div>
 
-            <section className="dashboard-bottom-grid">
-
-              {/* RECENT ACTIVITIES */}
-
-              <div className="dashboard-card activity-card">
-
-                <div className="card-heading">
-                  <div>
-                    <h3>Recent Activities</h3>
-                    <p>Latest updates from your school</p>
+                    <span className="system-card-icon">⌘</span>
                   </div>
 
-                  <span className="card-heading-icon">◷</span>
-                </div>
+                  <div className="system-info-list">
 
-                <div className="empty-state">
-                  <div className="empty-state-icon">▤</div>
+                    <div className="system-info-row">
+                      <span>Academic Year</span>
+                      <strong>2026</strong>
+                    </div>
 
-                  <strong>No recent activities yet</strong>
+                    <div className="system-info-row">
+                      <span>System Status</span>
+                      <strong className="active-status">
+                        <span className="online-dot"></span>
+                        Active
+                      </strong>
+                    </div>
 
-                  <p>
-                    New student, teacher and academic updates
-                    will appear here.
-                  </p>
-                </div>
+                    <div className="system-info-row">
+                      <span>User Role</span>
+                      <strong>{displayRole}</strong>
+                    </div>
 
-              </div>
+                    <div className="system-info-row">
+                      <span>Platform</span>
+                      <strong>EduManage</strong>
+                    </div>
 
-              {/* AI INSIGHTS */}
-
-              <div className="dashboard-card ai-card">
-
-                <div className="ai-card-heading">
-
-                  <div className="ai-icon">✦</div>
-
-                  <div>
-                    <h3>AI Insights</h3>
-                    <p>Intelligent school monitoring</p>
                   </div>
 
-                  <span className="ai-coming-soon">AI</span>
+                </div>
+
+              </section>
+
+              {/* BOTTOM DASHBOARD GRID */}
+
+              <section className="dashboard-bottom-grid">
+
+                {/* RECENT ACTIVITIES */}
+
+                <div className="dashboard-card activity-card">
+
+                  <div className="card-heading">
+                    <div>
+                      <h3>Recent Activities</h3>
+                      <p>Latest updates from your school</p>
+                    </div>
+
+                    <span className="card-heading-icon">◷</span>
+                  </div>
+
+                  <div className="empty-state">
+                    <div className="empty-state-icon">▤</div>
+
+                    <strong>No recent activities yet</strong>
+
+                    <p>
+                      New student, teacher and academic updates
+                      will appear here.
+                    </p>
+                  </div>
 
                 </div>
 
-                <div className="ai-content">
-                  <div className="ai-content-icon">✧</div>
+                {/* AI INSIGHTS */}
 
-                  <strong>Smart insights are coming soon</strong>
+                <div className="dashboard-card ai-card">
 
-                  <p>
-                    AI-powered student performance analysis,
-                    attendance anomaly detection and progress
-                    summaries will be available here.
-                  </p>
+                  <div className="ai-card-heading">
+
+                    <div className="ai-icon">✦</div>
+
+                    <div>
+                      <h3>AI Insights</h3>
+                      <p>Intelligent school monitoring</p>
+                    </div>
+
+                    <span className="ai-coming-soon">AI</span>
+
+                  </div>
+
+                  <div className="ai-content">
+                    <div className="ai-content-icon">✧</div>
+
+                    <strong>Smart insights are coming soon</strong>
+
+                    <p>
+                      AI-powered student performance analysis,
+                      attendance anomaly detection and progress
+                      summaries will be available here.
+                    </p>
+                  </div>
+
                 </div>
 
-              </div>
+              </section>
 
-            </section>
+              {/* FOOTER */}
 
-            {/* FOOTER */}
+              <footer className="dashboard-footer">
+                <span>© 2026 EduManage School Management System</span>
+                <span>Designed for smarter school management</span>
+              </footer>
 
-            <footer className="dashboard-footer">
-              <span>© 2026 EduManage School Management System</span>
-              <span>Designed for smarter school management</span>
-            </footer>
+            </div>
 
-          </div>
+          )
 
         ) : activeMenu === 'Students' ? (
 
@@ -806,24 +943,30 @@ function App() {
         ) : activeMenu === 'Examinations' ? (
 
           <Examinations />
+
         ) : activeMenu === 'Exam Schedule' ? (
 
           <ExamSchedule />
+
         ) : activeMenu === 'Marks Entry' ? (
 
           <MarksEntry />
+
         ) : activeMenu === 'Grade & GPA' ? (
 
           <GradeGPA />
+
         ) : activeMenu === 'Results' ? (
 
-         <Results />
+          <Results />
+
         ) : activeMenu === 'Result Publication' ? (
 
           <ResultPublication />
+
         ) : activeMenu === 'Student Result' ? (
 
-        <StudentResult />
+          <StudentResult />
 
         ) : activeMenu === 'Attendance' ? (
 
@@ -832,7 +975,11 @@ function App() {
         ) : activeMenu === 'Fees & Accounts' ? (
 
           <Accounts user={user} />
-        
+
+        ) : activeMenu === 'Leave Management' ? (
+
+          <Leave user={user} />
+
         ) : activeMenu === 'User Management' ? (
 
           <Users />

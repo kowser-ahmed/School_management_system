@@ -2,7 +2,7 @@
 const permissions = {
     admin: ["*"],
 
-       teacher: [
+    teacher: [
         "students:read",
         "teachers:read",
         "classes:read",
@@ -24,47 +24,54 @@ const permissions = {
         "results:read",
         "results:create",
         "results:update",
-        "results:delete"
-        
+        "results:delete",
+
+        // Leave permissions
+        "leave:read",
+        "leave:create"
     ],
 
-   
-accountant: [
-    // Fee structure
-    "fees:read",
-    "fees:create",
-    "fees:update",
-    "fees:delete",
+    staff: [
+        // Leave permissions
+        "leave:read",
+        "leave:create"
+    ],
 
-    // Student fees
-    "student-fees:read",
-    "student-fees:create",
+    accountant: [
+        // Fee structure
+        "fees:read",
+        "fees:create",
+        "fees:update",
+        "fees:delete",
 
-    // Dues
-    "dues:read",
+        // Student fees
+        "student-fees:read",
+        "student-fees:create",
 
-    // Payments
-    "payments:read",
-    "payments:create",
+        // Dues
+        "dues:read",
 
-    // Income
-    "income:read",
-    "income:create",
-    "income:update",
-    "income:delete",
+        // Payments
+        "payments:read",
+        "payments:create",
 
-    // Expenses
-    "expenses:read",
-    "expenses:create",
-    "expenses:update",
-    "expenses:delete",
+        // Income
+        "income:read",
+        "income:create",
+        "income:update",
+        "income:delete",
 
-    // Payslips
-    "payslips:read",
-    "payslips:create",
-    "payslips:pay"
-],
+        // Expenses
+        "expenses:read",
+        "expenses:create",
+        "expenses:update",
+        "expenses:delete",
 
+        // Payslips
+        "payslips:read",
+        "payslips:create",
+        "payslips:pay"
+    ],
 
     parent: [
         "children:read",
@@ -77,11 +84,10 @@ accountant: [
         "profile:read",
         "attendance:read",
         "results:read",
-        "fees:read" ,
+        "fees:read",
         "student:fees:read",
         "student:dues:read",
         "student:payments:read"
-        
     ]
 };
 

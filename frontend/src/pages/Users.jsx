@@ -10,16 +10,18 @@ const initialForm = {
   role: 'teacher',
   teacher_id: '',
   student_id: '',
+  staff_id: '',
   phone: '',
   status: 'active'
 }
 
-const roles = ['teacher', 'student', 'parent', 'accountant']
+const roles = ['teacher', 'student', 'parent', 'accountant', 'staff']
 
 function Users() {
   const [users, setUsers] = useState([])
   const [teachers, setTeachers] = useState([])
   const [students, setStudents] = useState([])
+  const [staffs, setStaffs] = useState([])
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -82,10 +84,28 @@ function Users() {
     }
   }
 
+  // Fetch staff profiles
+  const fetchStaffs = async () => {
+    try {
+      const response = await API.get('/staff')
+      const data = response.data.data || []
+
+      setStaffs(
+        data.filter(
+          staff =>
+            staff.status === 'active' || staff.status == null
+        )
+      )
+    } catch (err) {
+      console.error('Failed to load staff profiles:', err)
+    }
+  }
+
   useEffect(() => {
     fetchUsers()
     fetchTeachers()
     fetchStudents()
+    fetchStaffs()
   }, [])
 
   // Search and filters
@@ -139,6 +159,9 @@ function Users() {
       student_id: user.student_id
         ? String(user.student_id)
         : '',
+      staff_id: user.staff_id
+        ? String(user.staff_id)
+        : '',
       phone: user.phone || '',
       status: user.status || 'active'
     })
@@ -167,6 +190,7 @@ function Users() {
       if (name === 'role') {
         updated.teacher_id = ''
         updated.student_id = ''
+        updated.staff_id = ''
       }
 
       return updated
@@ -193,6 +217,11 @@ function Users() {
       return
     }
 
+    if (form.role === 'staff' && !form.staff_id) {
+      setError('Please select a Staff Profile.')
+      return
+    }
+
     try {
       setSaving(true)
 
@@ -209,6 +238,11 @@ function Users() {
         student_id:
           form.role === 'student'
             ? Number(form.student_id)
+            : null,
+
+        staff_id:
+          form.role === 'staff'
+            ? Number(form.staff_id)
             : null,
 
         phone: form.phone.trim()
@@ -231,6 +265,7 @@ function Users() {
       await fetchUsers()
       await fetchTeachers()
       await fetchStudents()
+      await fetchStaffs()
 
     } catch (err) {
       setError(
@@ -256,6 +291,7 @@ function Users() {
       await fetchUsers()
       await fetchTeachers()
       await fetchStudents()
+      await fetchStaffs()
 
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete user.')
@@ -354,6 +390,7 @@ function Users() {
               fetchUsers()
               fetchTeachers()
               fetchStudents()
+              fetchStaffs()
             }}
             title="Refresh users"
           >
@@ -617,6 +654,46 @@ function Users() {
                   </div>
                 )}
 
+                {/* Staff Profile */}
+                {form.role === 'staff' && (
+                  <div className="users-form-group">
+                    <label>Staff Profile *</label>
+
+                    <select
+                      name="staff_id"
+                      value={form.staff_id}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Staff Profile</option>
+
+                      {staffs.map(staff => {
+                        const linkedToAnotherUser =
+                          staff.user_id &&
+                          Number(staff.user_id) !==
+                            Number(editingUser?.user_id)
+
+                        return (
+                          <option
+                            key={staff.staff_id}
+                            value={staff.staff_id}
+                            disabled={Boolean(linkedToAnotherUser)}
+                          >
+                            {staff.full_name} ({staff.employee_code})
+                            {linkedToAnotherUser ? ' - Already Linked' : ''}
+                          </option>
+                        )
+                      })}
+                    </select>
+
+                    {staffs.length === 0 && (
+                      <small>
+                        No active Staff Profile found. Create a staff profile first.
+                      </small>
+                    )}
+                  </div>
+                )}
+
                 <div className="users-form-group">
                   <label>Phone Number</label>
                   <input
@@ -664,7 +741,8 @@ function Users() {
                   disabled={
                     saving ||
                     (form.role === 'teacher' && !form.teacher_id) ||
-                    (form.role === 'student' && !form.student_id)
+                    (form.role === 'student' && !form.student_id) ||
+                    (form.role === 'staff' && !form.staff_id)
                   }
                 >
                   {saving
