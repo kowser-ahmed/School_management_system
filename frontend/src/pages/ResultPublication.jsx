@@ -7,14 +7,20 @@ function ResultPublication() {
   const [exams, setExams] = useState([])
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const [processingId, setProcessingId] = useState(null)
 
   const fetchExams = async () => {
     try {
+      setError('')
+
       const response = await API.get('/exams')
+
       setExams(response.data.data || [])
-    } catch (error) {
-      setMessage(
-        error.response?.data?.message || 'Failed to load exams.'
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        'Failed to load examinations.'
       )
     } finally {
       setLoading(false)
@@ -26,94 +32,196 @@ function ResultPublication() {
   }, [])
 
   const handlePublication = async (examId, action) => {
-    const actionText = action === 'publish' ? 'publish' : 'unpublish'
+    const actionText =
+      action === 'publish' ? 'publish' : 'unpublish'
 
-    if (!window.confirm(`Are you sure you want to ${actionText} this result?`)) {
-      return
-    }
+    const confirmed = window.confirm(
+      `Are you sure you want to ${actionText} this result?`
+    )
+
+    if (!confirmed) return
 
     try {
+      setProcessingId(examId)
       setMessage('')
+      setError('')
 
-      await API.put(`/exams/${examId}/${action}`)
+      const response = await API.put(
+        `/exams/${examId}/${action}`
+      )
 
       setMessage(
-        action === 'publish'
-          ? 'Result published successfully.'
-          : 'Result unpublished successfully.'
+        response.data.message ||
+        (
+          action === 'publish'
+            ? 'Result published successfully.'
+            : 'Result unpublished successfully.'
+        )
       )
 
       await fetchExams()
-    } catch (error) {
-      setMessage(
-        error.response?.data?.message || 'Publication action failed.'
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        'Publication action failed.'
       )
+    } finally {
+      setProcessingId(null)
     }
   }
 
+  const getResultStatus = (status) => {
+    if (status === 'published') {
+      return 'Published'
+    }
+
+    if (status === 'completed') {
+      return 'Draft'
+    }
+
+    return 'Not Ready'
+  }
+
   if (loading) {
-    return <p>Loading exams...</p>
+    return (
+      <div className="exam-module-page">
+        <h2>Result Publication</h2>
+        <p>Loading examinations...</p>
+      </div>
+    )
   }
 
   return (
-  <div className="exam-module-page">
+    <div className="exam-module-page">
       <h2>Result Publication</h2>
 
-      {message && <p>{message}</p>}
+      <p>
+        Manage examination results and publish completed results.
+      </p>
+
+      {message && (
+        <p className="success-message">
+          {message}
+        </p>
+      )}
+
+      {error && (
+        <p className="error-message">
+          {error}
+        </p>
+      )}
 
       {exams.length === 0 ? (
-        <p>No exams found.</p>
+        <p>No examinations found.</p>
       ) : (
-        <table border="1" cellPadding="10" cellSpacing="0">
-          <thead>
-            <tr>
-              <th>Exam Name</th>
-              <th>Academic Year</th>
-              <th>Result Status</th>
-              <th>Published At</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {exams.map((exam) => (
-              <tr key={exam.exam_id}>
-                <td>{exam.exam_name}</td>
-                <td>{exam.academic_year}</td>
-
-                <td>
-                  {exam.result_status || 'draft'}
-                </td>
-
-                <td>
-                  {exam.published_at
-                    ? new Date(exam.published_at).toLocaleString()
-                    : 'Not published'}
-                </td>
-
-                <td>
-                  {exam.result_status === 'published' ? (
-                    <button
-                      onClick={() =>
-                        handlePublication(exam.exam_id, 'unpublish')
-                      }
-                    >
-                      Unpublish
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() =>
-                        handlePublication(exam.exam_id, 'publish')
-                      }
-                    >
-                      Publish
-                    </button>
-                  )}
-                </td>
+        <div style={{ overflowX: 'auto' }}>
+          <table
+            border="1"
+            cellPadding="10"
+            cellSpacing="0"
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse'
+            }}
+          >
+            <thead>
+              <tr>
+                <th>Exam Name</th>
+                <th>Class</th>
+                <th>Academic Year</th>
+                <th>Exam Status</th>
+                <th>Result Status</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {exams.map((exam) => {
+                const isPublished =
+                  exam.status === 'published'
+
+                const isCompleted =
+                  exam.status === 'completed'
+
+                const isProcessing =
+                  processingId === exam.exam_id
+
+                return (
+                  <tr key={exam.exam_id}>
+                    <td>{exam.exam_name || 'N/A'}</td>
+
+                    <td>{exam.class_name || 'N/A'}</td>
+
+                    <td>{exam.academic_year || 'N/A'}</td>
+
+                    <td>
+                      {exam.status
+                        ? exam.status.charAt(0).toUpperCase() +
+                          exam.status.slice(1)
+                        : 'N/A'}
+                    </td>
+
+                    <td>
+                      <span
+                        style={{
+                          fontWeight: 'bold',
+                          color: isPublished
+                            ? 'green'
+                            : isCompleted
+                              ? '#b7791f'
+                              : '#666'
+                        }}
+                      >
+                        {getResultStatus(exam.status)}
+                      </span>
+                    </td>
+
+                    <td>
+                      {isPublished ? (
+                        <button
+                          type="button"
+                          disabled={isProcessing}
+                          onClick={() =>
+                            handlePublication(
+                              exam.exam_id,
+                              'unpublish'
+                            )
+                          }
+                        >
+                          {isProcessing
+                            ? 'Please wait...'
+                            : 'Unpublish'}
+                        </button>
+                      ) : isCompleted ? (
+                        <button
+                          type="button"
+                          disabled={isProcessing}
+                          onClick={() =>
+                            handlePublication(
+                              exam.exam_id,
+                              'publish'
+                            )
+                          }
+                        >
+                          {isProcessing
+                            ? 'Please wait...'
+                            : 'Publish'}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                        >
+                          Complete Exam First
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )

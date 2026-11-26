@@ -1,3 +1,4 @@
+
 const express = require("express");
 
 const {
@@ -56,6 +57,7 @@ router.delete(
     authorizePermission("exams:delete"),
     deleteExam
 );
+
 // Publish exam result
 router.put(
     "/:id/publish",
@@ -71,4 +73,5 @@ router.put(
     authorizePermission("exams:update"),
     unpublishExamResult
 );
+
 module.exports = router;

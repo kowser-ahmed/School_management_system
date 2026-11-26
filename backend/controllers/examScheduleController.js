@@ -1,3 +1,4 @@
+
 const ExamSchedule = require("../models/examScheduleModel");
 
 // Get all exam schedules
@@ -12,6 +13,7 @@ const getAllExamSchedules = async (req, res) => {
         });
     } catch (error) {
         console.error("Get exam schedules error:", error);
+
         res.status(500).json({
             success: false,
             message: "Failed to retrieve exam schedules."
@@ -46,6 +48,7 @@ const getExamScheduleById = async (req, res) => {
         });
     } catch (error) {
         console.error("Get schedule error:", error);
+
         res.status(500).json({
             success: false,
             message: "Failed to retrieve exam schedule."
@@ -73,6 +76,7 @@ const getSchedulesByExamId = async (req, res) => {
         });
     } catch (error) {
         console.error("Get schedules by exam error:", error);
+
         res.status(500).json({
             success: false,
             message: "Failed to retrieve exam schedules."
@@ -89,23 +93,18 @@ const createExamSchedule = async (req, res) => {
             exam_date,
             start_time,
             end_time,
-            room
+            room,
+            room_number
         } = req.body;
 
-        if (
-            !Number.isInteger(Number(exam_id)) ||
-            Number(exam_id) <= 0
-        ) {
+        if (!Number.isInteger(Number(exam_id)) || Number(exam_id) <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "Valid exam ID is required."
             });
         }
 
-        if (
-            !Number.isInteger(Number(subject_id)) ||
-            Number(subject_id) <= 0
-        ) {
+        if (!Number.isInteger(Number(subject_id)) || Number(subject_id) <= 0) {
             return res.status(400).json({
                 success: false,
                 message: "Valid subject ID is required."
@@ -132,16 +131,19 @@ const createExamSchedule = async (req, res) => {
             exam_date,
             start_time: start_time || null,
             end_time: end_time || null,
-            room: room || null
+            room: room || room_number || null
         });
 
         res.status(201).json({
             success: true,
             message: "Exam schedule created successfully.",
-            data: { schedule_id: scheduleId }
+            data: {
+                schedule_id: scheduleId
+            }
         });
     } catch (error) {
         console.error("Create exam schedule error:", error);
+
         res.status(500).json({
             success: false,
             message: "Failed to create exam schedule."
@@ -167,7 +169,8 @@ const updateExamSchedule = async (req, res) => {
             exam_date,
             start_time,
             end_time,
-            room
+            room,
+            room_number
         } = req.body;
 
         if (
@@ -204,7 +207,7 @@ const updateExamSchedule = async (req, res) => {
                 exam_date,
                 start_time: start_time || null,
                 end_time: end_time || null,
-                room: room || null
+                room: room || room_number || null
             }
         );
 
@@ -221,6 +224,7 @@ const updateExamSchedule = async (req, res) => {
         });
     } catch (error) {
         console.error("Update exam schedule error:", error);
+
         res.status(500).json({
             success: false,
             message: "Failed to update exam schedule."
@@ -255,6 +259,7 @@ const deleteExamSchedule = async (req, res) => {
         });
     } catch (error) {
         console.error("Delete exam schedule error:", error);
+
         res.status(500).json({
             success: false,
             message: "Failed to delete exam schedule."

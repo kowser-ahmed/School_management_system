@@ -1,9 +1,10 @@
+
 const db = require("../config/db");
 
 // Get all exam schedules
 const getAllExamSchedules = async () => {
-    const [rows] = await db.query(
-        `SELECT
+    const [rows] = await db.query(`
+        SELECT
             es.schedule_id,
             es.exam_id,
             e.exam_name,
@@ -19,8 +20,8 @@ const getAllExamSchedules = async () => {
         JOIN exams e ON es.exam_id = e.exam_id
         JOIN classes c ON e.class_id = c.class_id
         JOIN subjects s ON es.subject_id = s.subject_id
-        ORDER BY es.exam_date ASC`
-    );
+        ORDER BY es.exam_date ASC
+    `);
 
     return rows;
 };
@@ -31,19 +32,24 @@ const getExamScheduleById = async (scheduleId) => {
         "SELECT * FROM exam_schedule WHERE schedule_id = ?",
         [scheduleId]
     );
+
     return rows[0];
 };
 
 // Get schedules by exam ID
 const getSchedulesByExamId = async (examId) => {
     const [rows] = await db.query(
-        `SELECT es.*, s.subject_name, s.subject_code
+        `SELECT
+            es.*,
+            s.subject_name,
+            s.subject_code
          FROM exam_schedule es
          JOIN subjects s ON es.subject_id = s.subject_id
          WHERE es.exam_id = ?
          ORDER BY es.exam_date ASC`,
         [examId]
     );
+
     return rows;
 };
 

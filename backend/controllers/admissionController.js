@@ -1,302 +1,478 @@
-
 const admissionModel = require("../models/admissionModel");
 
-// Get all admission applications
+
+// ===============================
+// Validation
+// ===============================
+const validateAdmissionData = (data) => {
+    const {
+        applicant_name,
+        date_of_birth,
+        gender,
+        guardian_name,
+        guardian_phone,
+        email,
+        address,
+        applying_class
+    } = data;
+
+
+    // Required fields
+    if (!applicant_name || !String(applicant_name).trim()) {
+        return "Applicant name is required.";
+    }
+
+    if (!date_of_birth) {
+        return "Date of birth is required.";
+    }
+
+    if (!gender) {
+        return "Gender is required.";
+    }
+
+    if (!guardian_name || !String(guardian_name).trim()) {
+        return "Guardian name is required.";
+    }
+
+    if (!guardian_phone || !String(guardian_phone).trim()) {
+        return "Guardian phone number is required.";
+    }
+
+    if (!email || !String(email).trim()) {
+        return "Gmail address is required.";
+    }
+
+    if (!address || !String(address).trim()) {
+        return "Address is required.";
+    }
+
+    if (!applying_class || !String(applying_class).trim()) {
+        return "Applying class is required.";
+    }
+
+
+    // ===============================
+    // Bangladesh Phone Validation
+    // ===============================
+    const phone = String(guardian_phone).trim();
+
+    const bangladeshPhoneRegex = /^01[3-9]\d{8}$/;
+
+    if (!bangladeshPhoneRegex.test(phone)) {
+        return "Please enter a valid Bangladesh mobile number.";
+    }
+
+
+    // ===============================
+    // Gmail Validation
+    // ===============================
+    const gmail = String(email).trim();
+
+    const gmailRegex =
+        /^[a-zA-Z0-9](?:[a-zA-Z0-9._+-]*[a-zA-Z0-9])?@gmail\.com$/;
+
+    if (!gmailRegex.test(gmail)) {
+        return "Please enter a valid Gmail address.";
+    }
+
+    // Consecutive dots are not accepted
+    if (gmail.includes("..")) {
+        return "Please enter a valid Gmail address.";
+    }
+
+    // Gmail username
+    const username = gmail.split("@")[0];
+
+    if (!username) {
+        return "Please enter a valid Gmail address.";
+    }
+
+    if (username.length > 30) {
+        return "Please enter a valid Gmail address.";
+    }
+
+    if (
+        username.startsWith(".") ||
+        username.endsWith(".")
+    ) {
+        return "Please enter a valid Gmail address.";
+    }
+
+
+    // ===============================
+    // Gender Validation
+    // ===============================
+    const allowedGenders = [
+        "male",
+        "female",
+        "other"
+    ];
+
+    if (!allowedGenders.includes(gender)) {
+        return "Invalid gender selected.";
+    }
+
+
+    // ===============================
+    // Date of Birth
+    // ===============================
+    // No age restriction.
+    // No specific DOB restriction.
+    // The date is accepted as submitted.
+
+
+    return null;
+};
+
+
+// ===============================
+// Get all admissions
+// ===============================
 const getAllAdmissions = async (req, res) => {
     try {
         const admissions = await admissionModel.getAllAdmissions();
 
-        return res.json({
+        res.json({
             success: true,
             data: admissions
         });
+
     } catch (error) {
         console.error("Get Admissions Error:", error);
 
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: "Failed to fetch admission applications"
+            message: "Failed to fetch admission applications."
         });
     }
 };
 
-// Get admission application by ID
+
+// ===============================
+// Get admission by ID
+// ===============================
 const getAdmissionById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const admission = await admissionModel.getAdmissionById(id);
+        const admission =
+            await admissionModel.getAdmissionById(id);
 
         if (!admission) {
             return res.status(404).json({
                 success: false,
-                message: "Admission application not found"
+                message: "Admission application not found."
             });
         }
 
-        return res.json({
+        res.json({
             success: true,
             data: admission
         });
-    } catch (error) {
-        console.error("Get Admission Error:", error);
 
-        return res.status(500).json({
+    } catch (error) {
+        console.error("Get Admission By ID Error:", error);
+
+        res.status(500).json({
             success: false,
-            message: "Failed to fetch admission application"
+            message: "Failed to fetch admission application."
         });
     }
 };
 
-// Create admission application
+
+// ===============================
+// Create admission
+// ===============================
 const createAdmission = async (req, res) => {
     try {
-        const admissionData = req.body;
 
-        if (!admissionData.applicant_name) {
+        const validationError =
+            validateAdmissionData(req.body);
+
+        if (validationError) {
             return res.status(400).json({
                 success: false,
-                message: "Applicant name is required"
+                message: validationError
             });
         }
 
-        if (!admissionData.applying_class) {
-            return res.status(400).json({
-                success: false,
-                message: "Applying class is required"
-            });
-        }
 
-        const applicationId = await admissionModel.createAdmission(
-            admissionData
-        );
+        const admissionData = {
+            applicant_name:
+                String(req.body.applicant_name).trim(),
 
-        return res.status(201).json({
+            date_of_birth:
+                req.body.date_of_birth,
+
+            gender:
+                req.body.gender,
+
+            guardian_name:
+                String(req.body.guardian_name).trim(),
+
+            guardian_phone:
+                String(req.body.guardian_phone).trim(),
+
+            email:
+                String(req.body.email).trim(),
+
+            address:
+                String(req.body.address).trim(),
+
+            applying_class:
+                String(req.body.applying_class).trim()
+        };
+
+
+        const result =
+            await admissionModel.createAdmission(
+                admissionData
+            );
+
+
+        res.status(201).json({
             success: true,
-            message: "Admission application submitted successfully",
-            application_id: applicationId
+            message:
+                "Admission application submitted successfully!",
+            data: result
         });
+
     } catch (error) {
         console.error("Create Admission Error:", error);
 
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: "Failed to submit admission application"
+            message:
+                "Failed to submit admission application."
         });
     }
 };
 
-// Update admission application
+
+// ===============================
+// Update admission
+// ===============================
 const updateAdmission = async (req, res) => {
     try {
         const { id } = req.params;
-        const admissionData = req.body;
 
-        if (!admissionData.applicant_name) {
+
+        const validationError =
+            validateAdmissionData(req.body);
+
+        if (validationError) {
             return res.status(400).json({
                 success: false,
-                message: "Applicant name is required"
+                message: validationError
             });
         }
 
-        const affectedRows = await admissionModel.updateAdmission(
-            id,
-            admissionData
-        );
 
-        if (affectedRows === 0) {
+        const admissionData = {
+            applicant_name:
+                String(req.body.applicant_name).trim(),
+
+            date_of_birth:
+                req.body.date_of_birth,
+
+            gender:
+                req.body.gender,
+
+            guardian_name:
+                String(req.body.guardian_name).trim(),
+
+            guardian_phone:
+                String(req.body.guardian_phone).trim(),
+
+            email:
+                String(req.body.email).trim(),
+
+            address:
+                String(req.body.address).trim(),
+
+            applying_class:
+                String(req.body.applying_class).trim()
+        };
+
+
+        const result =
+            await admissionModel.updateAdmission(
+                id,
+                admissionData
+            );
+
+
+        if (!result) {
             return res.status(404).json({
                 success: false,
-                message: "Admission application not found"
+                message:
+                    "Admission application not found."
             });
         }
 
-        return res.json({
+
+        res.json({
             success: true,
-            message: "Admission application updated successfully"
+            message:
+                "Admission application updated successfully.",
+            data: result
         });
+
     } catch (error) {
         console.error("Update Admission Error:", error);
 
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: "Failed to update admission application"
+            message:
+                "Failed to update admission application."
         });
     }
 };
 
+
+// ===============================
 // Update admission status
-// Approving an application automatically creates a Student record
+// ===============================
 const updateAdmissionStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
 
-        if (!/^\d+$/.test(String(id)) || Number(id) <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid admission application ID"
-            });
-        }
 
-        const allowedStatuses = ["pending", "approved", "rejected"];
+        const allowedStatuses = [
+            "pending",
+            "approved",
+            "rejected",
+            "enrolled"
+        ];
+
 
         if (!allowedStatuses.includes(status)) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid admission status"
+                message: "Invalid admission status."
             });
         }
 
-        const affectedRows = await admissionModel.updateAdmissionStatus(
-            id,
-            status
-        );
 
-        if (affectedRows === 0) {
+        const result =
+            await admissionModel.updateAdmissionStatus(
+                id,
+                status
+            );
+
+
+        if (!result) {
             return res.status(404).json({
                 success: false,
-                message: "Admission application not found"
+                message:
+                    "Admission application not found."
             });
         }
 
-        return res.json({
+
+        res.json({
             success: true,
-            message: status === "approved"
-                ? "Admission approved and student added successfully"
-                : `Admission status updated to ${status}`,
-            status: status
+            message:
+                `Admission status updated to ${status} successfully.`,
+            data: result
         });
 
     } catch (error) {
-        console.error("Update Admission Status Error:", error);
+        console.error(
+            "Update Admission Status Error:",
+            error
+        );
 
-        if (error.code === "ADMISSION_NOT_FOUND") {
-            return res.status(404).json({
-                success: false,
-                message: error.message
-            });
-        }
-
-        if (error.code === "ADMISSION_CLASS_NOT_FOUND") {
-            return res.status(400).json({
-                success: false,
-                message: "Applying class was not found. Please check the class name in Classes module."
-            });
-        }
-
-        if (
-            error.code === "ADMISSION_ALREADY_ENROLLED" ||
-            error.code === "ADMISSION_NOT_APPROVED"
-        ) {
-            return res.status(409).json({
-                success: false,
-                message: error.message
-            });
-        }
-
-        if (error.code === "ER_DUP_ENTRY") {
-            return res.status(409).json({
-                success: false,
-                message: "Student already exists or duplicate student information"
-            });
-        }
-
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: error.message || "Failed to update admission status"
+            message:
+                "Failed to update admission status."
         });
     }
 };
 
-// Enroll approved applicant
+
+// ===============================
+// Enroll applicant
+// ===============================
 const enrollAdmission = async (req, res) => {
     try {
         const { id } = req.params;
 
-        if (!/^\d+$/.test(String(id)) || Number(id) <= 0) {
-            return res.status(400).json({
+
+        const result =
+            await admissionModel.enrollAdmission(id);
+
+
+        if (!result) {
+            return res.status(404).json({
                 success: false,
-                message: "Invalid admission application ID"
+                message:
+                    "Admission application not found."
             });
         }
 
-        const studentId = await admissionModel.enrollAdmission(id);
 
-        return res.status(201).json({
+        res.json({
             success: true,
-            message: "Applicant successfully enrolled",
-            student_id: studentId
+            message:
+                "Applicant successfully enrolled and added to Students List!",
+            data: result
         });
 
     } catch (error) {
         console.error("Enroll Admission Error:", error);
 
-        if (error.code === "ADMISSION_NOT_FOUND") {
-            return res.status(404).json({
-                success: false,
-                message: error.message
-            });
-        }
-
-        if (
-            error.code === "ADMISSION_ALREADY_ENROLLED" ||
-            error.code === "ADMISSION_NOT_APPROVED"
-        ) {
-            return res.status(409).json({
-                success: false,
-                message: error.message
-            });
-        }
-
-        if (error.code === "ADMISSION_CLASS_NOT_FOUND") {
-            return res.status(400).json({
-                success: false,
-                message: error.message
-            });
-        }
-
-        if (error.code === "ER_DUP_ENTRY") {
-            return res.status(409).json({
-                success: false,
-                message: "Student already exists or duplicate student code"
-            });
-        }
-
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: "Failed to enroll applicant"
+            message:
+                error.message ||
+                "Failed to enroll applicant."
         });
     }
 };
 
-// Delete admission application
+
+// ===============================
+// Delete admission
+// ===============================
 const deleteAdmission = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const affectedRows = await admissionModel.deleteAdmission(id);
 
-        if (affectedRows === 0) {
+        const result =
+            await admissionModel.deleteAdmission(id);
+
+
+        if (!result) {
             return res.status(404).json({
                 success: false,
-                message: "Admission application not found"
+                message:
+                    "Admission application not found."
             });
         }
 
-        return res.json({
+
+        res.json({
             success: true,
-            message: "Admission application deleted successfully"
+            message:
+                "Admission application deleted successfully."
         });
+
     } catch (error) {
         console.error("Delete Admission Error:", error);
 
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
-            message: "Failed to delete admission application"
+            message:
+                "Failed to delete admission application."
         });
     }
 };
+
 
 module.exports = {
     getAllAdmissions,

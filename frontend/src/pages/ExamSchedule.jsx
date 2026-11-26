@@ -10,7 +10,7 @@ function ExamSchedule() {
   const [subjects, setSubjects] = useState([])
   const [schedules, setSchedules] = useState([])
 
-  const [form, setForm] = useState({
+  const initialForm = {
     exam_id: '',
     class_id: '',
     section_id: '',
@@ -19,9 +19,11 @@ function ExamSchedule() {
     start_time: '',
     end_time: '',
     room_number: ''
-  })
+  }
 
+  const [form, setForm] = useState(initialForm)
   const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchDropdownData()
@@ -54,42 +56,91 @@ function ExamSchedule() {
       setSchedules(response.data.data || [])
     } catch (error) {
       console.error('Schedule loading error:', error)
+      setMessage('Failed to load exam schedules.')
     }
   }
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    })
+    const { name, value } = e.target
+
+    setForm(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleExamChange = (e) => {
+    const examId = e.target.value
+    const selectedExam = exams.find(
+      item => String(item.exam_id) === String(examId)
+    )
+
+    setForm(prev => ({
+      ...prev,
+      exam_id: examId,
+      class_id: selectedExam ? String(selectedExam.class_id) : '',
+      section_id: '',
+      subject_id: ''
+    }))
+  }
+
+  const handleClassChange = (e) => {
+    const classId = e.target.value
+
+    setForm(prev => ({
+      ...prev,
+      class_id: classId,
+      section_id: '',
+      subject_id: ''
+    }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setMessage('')
 
-    try {
-      await API.post('/exam-schedules', form)
-      setMessage('Exam schedule created successfully.')
+    if (!form.exam_id || !form.class_id || !form.subject_id) {
+      setMessage('Please select examination, class and subject.')
+      return
+    }
 
-      setForm({
-        exam_id: '',
-        class_id: '',
-        section_id: '',
-        subject_id: '',
-        exam_date: '',
-        start_time: '',
-        end_time: '',
-        room_number: ''
+    if (!form.section_id) {
+      setMessage('Please select a section.')
+      return
+    }
+
+    if (form.start_time >= form.end_time) {
+      setMessage('End time must be later than start time.')
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      await API.post('/exam-schedules', {
+        exam_id: Number(form.exam_id),
+        subject_id: Number(form.subject_id),
+        exam_date: form.exam_date,
+        start_time: form.start_time,
+        end_time: form.end_time,
+        room_number: form.room_number
       })
 
-      fetchSchedules()
+      setMessage(
+        'Exam schedule created successfully. Section was selected but is not stored in the database.'
+      )
+
+      setForm(initialForm)
+      await fetchSchedules()
     } catch (error) {
       console.error('Create schedule error:', error)
+
       setMessage(
         error.response?.data?.message ||
         'Failed to create exam schedule.'
       )
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -101,15 +152,24 @@ function ExamSchedule() {
     try {
       await API.delete(`/exam-schedules/${id}`)
       setMessage('Schedule deleted successfully.')
-      fetchSchedules()
+      await fetchSchedules()
     } catch (error) {
       console.error('Delete schedule error:', error)
       setMessage('Failed to delete schedule.')
     }
   }
 
+  const filteredSections = sections.filter(
+    item => String(item.class_id) === String(form.class_id)
+  )
+
+  const filteredSubjects = subjects.filter(
+    item => String(item.class_id) === String(form.class_id)
+  )
+
   return (
     <div className="dashboard-content">
+
       <div className="dashboard-section-heading">
         <div>
           <h2>Exam Schedule Management</h2>
@@ -123,16 +183,21 @@ function ExamSchedule() {
         <h3>Create Exam Schedule</h3>
 
         <form onSubmit={handleSubmit}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '16px'
-          }}>
-
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '16px'
+            }}
+          >
             <div>
               <label>Examination</label>
-              <select name="exam_id" value={form.exam_id}
-                onChange={handleChange} required>
+              <select
+                name="exam_id"
+                value={form.exam_id}
+                onChange={handleExamChange}
+                required
+              >
                 <option value="">Select Examination</option>
                 {exams.map(exam => (
                   <option key={exam.exam_id} value={exam.exam_id}>
@@ -144,8 +209,12 @@ function ExamSchedule() {
 
             <div>
               <label>Class</label>
-              <select name="class_id" value={form.class_id}
-                onChange={handleChange} required>
+              <select
+                name="class_id"
+                value={form.class_id}
+                onChange={handleClassChange}
+                required
+              >
                 <option value="">Select Class</option>
                 {classes.map(item => (
                   <option key={item.class_id} value={item.class_id}>
@@ -157,10 +226,15 @@ function ExamSchedule() {
 
             <div>
               <label>Section</label>
-              <select name="section_id" value={form.section_id}
-                onChange={handleChange} required>
+              <select
+                name="section_id"
+                value={form.section_id}
+                onChange={handleChange}
+                required
+                disabled={!form.class_id}
+              >
                 <option value="">Select Section</option>
-                {sections.map(item => (
+                {filteredSections.map(item => (
                   <option key={item.section_id} value={item.section_id}>
                     {item.section_name}
                   </option>
@@ -170,10 +244,15 @@ function ExamSchedule() {
 
             <div>
               <label>Subject</label>
-              <select name="subject_id" value={form.subject_id}
-                onChange={handleChange} required>
+              <select
+                name="subject_id"
+                value={form.subject_id}
+                onChange={handleChange}
+                required
+                disabled={!form.class_id}
+              >
                 <option value="">Select Subject</option>
-                {subjects.map(item => (
+                {filteredSubjects.map(item => (
                   <option key={item.subject_id} value={item.subject_id}>
                     {item.subject_name}
                   </option>
@@ -183,43 +262,63 @@ function ExamSchedule() {
 
             <div>
               <label>Exam Date</label>
-              <input type="date" name="exam_date"
+              <input
+                type="date"
+                name="exam_date"
                 value={form.exam_date}
-                onChange={handleChange} required />
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div>
               <label>Start Time</label>
-              <input type="time" name="start_time"
+              <input
+                type="time"
+                name="start_time"
                 value={form.start_time}
-                onChange={handleChange} required />
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div>
               <label>End Time</label>
-              <input type="time" name="end_time"
+              <input
+                type="time"
+                name="end_time"
                 value={form.end_time}
-                onChange={handleChange} required />
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div>
               <label>Room Number</label>
-              <input type="text" name="room_number"
+              <input
+                type="text"
+                name="room_number"
                 value={form.room_number}
                 onChange={handleChange}
-                placeholder="Enter room number" />
+                placeholder="Enter room number"
+              />
             </div>
-
           </div>
 
-          <button type="submit" style={{ marginTop: '20px' }}>
-            Create Schedule
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ marginTop: '20px' }}
+          >
+            {loading ? 'Creating...' : 'Create Schedule'}
           </button>
         </form>
       </div>
 
-      <div className="dashboard-card"
-        style={{ padding: '24px', marginTop: '24px' }}>
+      <div
+        className="dashboard-card"
+        style={{ padding: '24px', marginTop: '24px' }}
+      >
         <h3>Exam Schedule List</h3>
 
         <div style={{ overflowX: 'auto' }}>
@@ -228,7 +327,6 @@ function ExamSchedule() {
               <tr>
                 <th>Examination</th>
                 <th>Class</th>
-                <th>Section</th>
                 <th>Subject</th>
                 <th>Date</th>
                 <th>Start Time</th>
@@ -241,23 +339,23 @@ function ExamSchedule() {
             <tbody>
               {schedules.length === 0 ? (
                 <tr>
-                  <td colSpan="9">No exam schedules found.</td>
+                  <td colSpan="8">No exam schedules found.</td>
                 </tr>
               ) : (
                 schedules.map(item => (
                   <tr key={item.schedule_id}>
                     <td>{item.exam_name}</td>
                     <td>{item.class_name}</td>
-                    <td>{item.section_name}</td>
                     <td>{item.subject_name}</td>
                     <td>{item.exam_date?.slice(0, 10)}</td>
                     <td>{item.start_time}</td>
                     <td>{item.end_time}</td>
-                    <td>{item.room_number}</td>
+                    <td>{item.room || '-'}</td>
                     <td>
-                      <button onClick={() =>
-                        handleDelete(item.schedule_id)
-                      }>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(item.schedule_id)}
+                      >
                         Delete
                       </button>
                     </td>

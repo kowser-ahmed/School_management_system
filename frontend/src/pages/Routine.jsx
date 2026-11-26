@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import API from "../api/axios";
 import "./Routine.css";
@@ -141,7 +140,8 @@ const Routine = ({ userRole }) => {
     setFormData((prev) => ({
       ...prev,
       class_id: e.target.value,
-      section_id: ""
+      section_id: "",
+      subject_id: ""
     }));
   };
 
@@ -303,10 +303,11 @@ const Routine = ({ userRole }) => {
               <option value="">Select Section</option>
 
               {sections
-                .filter((item) =>
-                  !item.class_id ||
-                  String(item.class_id) ===
-                    String(formData.class_id)
+                .filter(
+                  (item) =>
+                    !item.class_id ||
+                    String(item.class_id) ===
+                      String(formData.class_id)
                 )
                 .map((item) => (
                   <option
@@ -325,17 +326,28 @@ const Routine = ({ userRole }) => {
               value={formData.subject_id}
               onChange={handleChange}
               required
+              disabled={!formData.class_id}
             >
-              <option value="">Select Subject</option>
+              <option value="">
+                {formData.class_id
+                  ? "Select Subject"
+                  : "Select Class First"}
+              </option>
 
-              {subjects.map((item) => (
-                <option
-                  key={item.subject_id}
-                  value={item.subject_id}
-                >
-                  {item.subject_name}
-                </option>
-              ))}
+              {subjects
+                .filter(
+                  (item) =>
+                    String(item.class_id) ===
+                    String(formData.class_id)
+                )
+                .map((item) => (
+                  <option
+                    key={item.subject_id}
+                    value={item.subject_id}
+                  >
+                    {item.subject_name}
+                  </option>
+                ))}
             </select>
 
             {/* Teacher */}
@@ -463,15 +475,20 @@ const Routine = ({ userRole }) => {
                   </td>
 
                   <td>
-                    {routine.section_name || routine.section_id || "-"}
+                    {routine.section_name ||
+                      routine.section_id ||
+                      "-"}
                   </td>
 
                   <td>
-                    {routine.subject_name || routine.subject_id}
+                    {routine.subject_name ||
+                      routine.subject_id}
                   </td>
 
                   <td>
-                    {routine.teacher_name || routine.teacher_id || "-"}
+                    {routine.teacher_name ||
+                      routine.teacher_id ||
+                      "-"}
                   </td>
 
                   <td>{routine.day_of_week}</td>
@@ -486,9 +503,14 @@ const Routine = ({ userRole }) => {
                     <td>
                       <button
                         type="button"
-                        disabled={deletingId === routine.routine_id}
+                        disabled={
+                          deletingId ===
+                          routine.routine_id
+                        }
                         onClick={() =>
-                          handleDeleteRoutine(routine.routine_id)
+                          handleDeleteRoutine(
+                            routine.routine_id
+                          )
                         }
                         style={{
                           backgroundColor: "#ef4444",
@@ -496,15 +518,20 @@ const Routine = ({ userRole }) => {
                           border: "none",
                           padding: "8px 16px",
                           borderRadius: "6px",
-                          cursor: deletingId === routine.routine_id
-                            ? "not-allowed"
-                            : "pointer",
-                          opacity: deletingId === routine.routine_id
-                            ? 0.6
-                            : 1
+                          cursor:
+                            deletingId ===
+                            routine.routine_id
+                              ? "not-allowed"
+                              : "pointer",
+                          opacity:
+                            deletingId ===
+                            routine.routine_id
+                              ? 0.6
+                              : 1
                         }}
                       >
-                        {deletingId === routine.routine_id
+                        {deletingId ===
+                        routine.routine_id
                           ? "Deleting..."
                           : "Delete"}
                       </button>

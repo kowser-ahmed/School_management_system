@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import './Admission.css'
 import API from '../api/axios'
@@ -26,7 +25,6 @@ const Admission = () => {
   const [listLoading, setListLoading] = useState(false)
   const [updatingId, setUpdatingId] = useState(null)
 
-  // Fetch all admission applications
   const fetchAdmissions = async () => {
     try {
       setListLoading(true)
@@ -40,11 +38,14 @@ const Admission = () => {
         setListError('Failed to load admission applications.')
       }
     } catch (err) {
-      console.error('Fetch Admissions Error:', err.response?.data || err.message)
+      console.error(
+        'Fetch Admissions Error:',
+        err.response?.data || err.message
+      )
 
       setListError(
         err.response?.data?.message ||
-        'Failed to load admission applications.'
+          'Failed to load admission applications.'
       )
     } finally {
       setListLoading(false)
@@ -55,7 +56,6 @@ const Admission = () => {
     fetchAdmissions()
   }, [])
 
-  // Handle form input
   const handleChange = (e) => {
     const { name, value } = e.target
 
@@ -65,21 +65,126 @@ const Admission = () => {
     }))
   }
 
-  // Submit admission application
+  // Bangladesh mobile number validation
+  const isValidBangladeshPhone = (phone) => {
+    const phoneRegex = /^01[3-9]\d{8}$/
+    return phoneRegex.test(phone)
+  }
+
+  // Gmail format validation
+  const isValidGmail = (email) => {
+    const gmailRegex =
+      /^[a-zA-Z0-9](?:[a-zA-Z0-9._+-]*[a-zA-Z0-9])?@gmail\.com$/
+
+    if (!gmailRegex.test(email)) {
+      return false
+    }
+
+    // Prevent consecutive dots
+    if (email.includes('..')) {
+      return false
+    }
+
+    // Gmail username must not contain invalid characters
+    const username = email.split('@')[0]
+
+    if (!username) {
+      return false
+    }
+
+    if (username.length > 30) {
+      return false
+    }
+
+    if (username.startsWith('.') || username.endsWith('.')) {
+      return false
+    }
+
+    return true
+  }
+
+  const validateForm = () => {
+    if (!formData.applicant_name.trim()) {
+      return 'Applicant name is required.'
+    }
+
+    // Date of birth has NO format/age validation.
+    // It is only checked for required value.
+    if (!formData.date_of_birth) {
+      return 'Date of birth is required.'
+    }
+
+    if (!formData.gender) {
+      return 'Gender is required.'
+    }
+
+    if (!formData.guardian_name.trim()) {
+      return 'Guardian name is required.'
+    }
+
+    const phone = formData.guardian_phone.trim()
+
+    if (!phone) {
+      return 'Guardian phone number is required.'
+    }
+
+    if (!isValidBangladeshPhone(phone)) {
+      return 'Please enter a valid Bangladesh mobile number.'
+    }
+
+    const email = formData.email.trim()
+
+    if (!email) {
+      return 'Gmail address is required.'
+    }
+
+    if (!isValidGmail(email)) {
+      return 'Please enter a valid Gmail address.'
+    }
+
+    if (!formData.address.trim()) {
+      return 'Address is required.'
+    }
+
+    if (!formData.applying_class.trim()) {
+      return 'Applying class is required.'
+    }
+
+    return ''
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     setMessage('')
     setError('')
+
+    const validationError = validateForm()
+
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+
     setLoading(true)
 
     try {
-      const response = await API.post('/admissions', formData)
+      const submitData = {
+        ...formData,
+        applicant_name: formData.applicant_name.trim(),
+        guardian_name: formData.guardian_name.trim(),
+        guardian_phone: formData.guardian_phone.trim(),
+        email: formData.email.trim(),
+        address: formData.address.trim(),
+        applying_class: formData.applying_class.trim(),
+      }
+
+      const response = await API.post('/admissions', submitData)
 
       if (response.data.success) {
         setMessage(
           response.data.message ||
-          'Admission application submitted successfully!'
+            'Admission application submitted successfully!'
         )
 
         setFormData({ ...initialFormData })
@@ -87,18 +192,20 @@ const Admission = () => {
         await fetchAdmissions()
       }
     } catch (err) {
-      console.error('Admission Submit Error:', err.response?.data || err.message)
+      console.error(
+        'Admission Submit Error:',
+        err.response?.data || err.message
+      )
 
       setError(
         err.response?.data?.message ||
-        'Failed to submit admission application.'
+          'Failed to submit admission application.'
       )
     } finally {
       setLoading(false)
     }
   }
 
-  // Approve or reject admission application
   const handleStatusChange = async (id, status) => {
     const confirmed = window.confirm(
       `Are you sure you want to change this application status to ${status}?`
@@ -117,22 +224,27 @@ const Admission = () => {
       )
 
       if (response.data.success) {
-        setMessage(`Admission status updated to ${status} successfully.`)
+        setMessage(
+          `Admission status updated to ${status} successfully.`
+        )
+
         await fetchAdmissions()
       }
     } catch (err) {
-      console.error('Status Update Error:', err.response?.data || err.message)
+      console.error(
+        'Status Update Error:',
+        err.response?.data || err.message
+      )
 
       setError(
         err.response?.data?.message ||
-        'Failed to update admission status.'
+          'Failed to update admission status.'
       )
     } finally {
       setUpdatingId(null)
     }
   }
 
-  // Enroll approved applicant into Students List
   const handleEnroll = async (id) => {
     const confirmed = window.confirm(
       'Are you sure you want to enroll this applicant? This will add the applicant to the Students List.'
@@ -152,35 +264,34 @@ const Admission = () => {
       if (response.data.success) {
         setMessage(
           response.data.message ||
-          'Applicant successfully enrolled and added to Students List!'
+            'Applicant successfully enrolled and added to Students List!'
         )
 
         await fetchAdmissions()
       }
     } catch (err) {
-      console.error('Enroll Error:', err.response?.data || err.message)
+      console.error(
+        'Enroll Error:',
+        err.response?.data || err.message
+      )
 
       setError(
         err.response?.data?.message ||
-        'Failed to enroll applicant.'
+          'Failed to enroll applicant.'
       )
     } finally {
       setUpdatingId(null)
     }
   }
 
-  // Status color class
   const getStatusClass = (status) => {
     switch (status) {
       case 'approved':
         return 'approved'
-
       case 'rejected':
         return 'rejected'
-
       case 'enrolled':
         return 'enrolled'
-
       default:
         return 'pending'
     }
@@ -190,45 +301,43 @@ const Admission = () => {
     <div className="admission-page">
       <div className="admission-container">
 
-        {/* Page Header */}
         <div className="admission-header">
           <h1>Online Admission</h1>
           <p>Submit and manage student admission applications.</p>
         </div>
 
-        {/* Success Message */}
         {message && (
           <div className="success-message">
             {message}
           </div>
         )}
 
-        {/* Error Message */}
         {error && (
           <div className="error-message">
             {error}
           </div>
         )}
 
-        {/* Admission Form */}
         <form
           onSubmit={handleSubmit}
           className="admission-form"
+          noValidate
         >
           <div className="form-group">
             <label>Applicant Name *</label>
+
             <input
               type="text"
               name="applicant_name"
               value={formData.applicant_name}
               onChange={handleChange}
               placeholder="Enter applicant name"
-              required
             />
           </div>
 
           <div className="form-group">
-            <label>Date of Birth</label>
+            <label>Date of Birth *</label>
+
             <input
               type="date"
               name="date_of_birth"
@@ -238,7 +347,8 @@ const Admission = () => {
           </div>
 
           <div className="form-group">
-            <label>Gender</label>
+            <label>Gender *</label>
+
             <select
               name="gender"
               value={formData.gender}
@@ -252,7 +362,8 @@ const Admission = () => {
           </div>
 
           <div className="form-group">
-            <label>Guardian Name</label>
+            <label>Guardian Name *</label>
+
             <input
               type="text"
               name="guardian_name"
@@ -263,29 +374,41 @@ const Admission = () => {
           </div>
 
           <div className="form-group">
-            <label>Guardian Phone</label>
+            <label>Guardian Phone *</label>
+
             <input
               type="tel"
               name="guardian_phone"
               value={formData.guardian_phone}
               onChange={handleChange}
-              placeholder="Enter guardian phone number"
+              placeholder="Example: 01712345678"
+              maxLength="11"
             />
+
+            <small>
+              Enter a valid Bangladesh mobile number.
+            </small>
           </div>
 
           <div className="form-group">
-            <label>Email</label>
+            <label>Gmail Address *</label>
+
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter email address"
+              placeholder="example@gmail.com"
             />
+
+            <small>
+              Only valid Gmail addresses are accepted.
+            </small>
           </div>
 
           <div className="form-group">
-            <label>Address</label>
+            <label>Address *</label>
+
             <textarea
               name="address"
               value={formData.address}
@@ -297,13 +420,13 @@ const Admission = () => {
 
           <div className="form-group">
             <label>Applying Class *</label>
+
             <input
               type="text"
               name="applying_class"
               value={formData.applying_class}
               onChange={handleChange}
               placeholder="Example: Class 6"
-              required
             />
           </div>
 
@@ -316,7 +439,6 @@ const Admission = () => {
           </button>
         </form>
 
-        {/* Admission Records */}
         <div className="admission-records">
 
           <div className="records-header">
@@ -335,14 +457,12 @@ const Admission = () => {
             </button>
           </div>
 
-          {/* List Error */}
           {listError && (
             <div className="error-message">
               {listError}
             </div>
           )}
 
-          {/* Loading */}
           {listLoading ? (
             <div className="records-info">
               Loading admission applications...
@@ -353,6 +473,7 @@ const Admission = () => {
             </div>
           ) : (
             <div className="table-wrapper">
+
               <table className="admission-table">
 
                 <thead>
@@ -386,17 +507,29 @@ const Admission = () => {
                           : '-'}
                       </td>
 
-                      <td>{admission.gender || '-'}</td>
+                      <td>
+                        {admission.gender || '-'}
+                      </td>
 
-                      <td>{admission.guardian_name || '-'}</td>
+                      <td>
+                        {admission.guardian_name || '-'}
+                      </td>
 
-                      <td>{admission.guardian_phone || '-'}</td>
+                      <td>
+                        {admission.guardian_phone || '-'}
+                      </td>
 
-                      <td>{admission.email || '-'}</td>
+                      <td>
+                        {admission.email || '-'}
+                      </td>
 
-                      <td>{admission.address || '-'}</td>
+                      <td>
+                        {admission.address || '-'}
+                      </td>
 
-                      <td>{admission.applying_class || '-'}</td>
+                      <td>
+                        {admission.applying_class || '-'}
+                      </td>
 
                       <td>
                         {admission.application_date
@@ -408,7 +541,9 @@ const Admission = () => {
 
                       <td>
                         <span
-                          className={`status ${getStatusClass(admission.status)}`}
+                          className={`status ${getStatusClass(
+                            admission.status
+                          )}`}
                         >
                           {admission.status}
                         </span>
@@ -421,7 +556,8 @@ const Admission = () => {
                             type="button"
                             className="approve-btn"
                             disabled={
-                              updatingId === admission.application_id ||
+                              updatingId ===
+                                admission.application_id ||
                               admission.status === 'approved' ||
                               admission.status === 'enrolled'
                             }
@@ -439,7 +575,8 @@ const Admission = () => {
                             type="button"
                             className="reject-btn"
                             disabled={
-                              updatingId === admission.application_id ||
+                              updatingId ===
+                                admission.application_id ||
                               admission.status === 'rejected' ||
                               admission.status === 'enrolled'
                             }
@@ -457,14 +594,18 @@ const Admission = () => {
                             type="button"
                             className="enroll-btn"
                             disabled={
-                              updatingId === admission.application_id ||
+                              updatingId ===
+                                admission.application_id ||
                               admission.status !== 'approved'
                             }
                             onClick={() =>
-                              handleEnroll(admission.application_id)
+                              handleEnroll(
+                                admission.application_id
+                              )
                             }
                           >
-                            {updatingId === admission.application_id
+                            {updatingId ===
+                            admission.application_id
                               ? 'Processing...'
                               : 'Enroll'}
                           </button>
@@ -477,10 +618,10 @@ const Admission = () => {
                 </tbody>
 
               </table>
+
             </div>
           )}
 
-          {/* Total Applications */}
           <p className="records-count">
             Total Applications: {admissions.length}
           </p>

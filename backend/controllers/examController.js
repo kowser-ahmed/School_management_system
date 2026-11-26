@@ -1,3 +1,4 @@
+
 const Exam = require("../models/examModel");
 
 // Get all exams
@@ -5,17 +6,16 @@ const getAllExams = async (req, res) => {
     try {
         const exams = await Exam.getAllExams();
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "Exams retrieved successfully.",
             data: exams
         });
     } catch (error) {
-        console.error("Get all exams error:", error);
+        console.error("Get All Exams Error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to retrieve exams."
+            message: "Failed to fetch examinations."
         });
     }
 };
@@ -28,7 +28,7 @@ const getExamById = async (req, res) => {
         if (!Number.isInteger(examId) || examId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid exam ID."
+                message: "Invalid examination ID."
             });
         }
 
@@ -37,20 +37,20 @@ const getExamById = async (req, res) => {
         if (!exam) {
             return res.status(404).json({
                 success: false,
-                message: "Exam not found."
+                message: "Examination not found."
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
             data: exam
         });
     } catch (error) {
-        console.error("Get exam by ID error:", error);
+        console.error("Get Exam By ID Error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to retrieve exam."
+            message: "Failed to fetch examination."
         });
     }
 };
@@ -74,33 +74,75 @@ const createExam = async (req, res) => {
             });
         }
 
-        if (!class_id || !Number.isInteger(Number(class_id)) || Number(class_id) <= 0) {
+        const classId = Number(class_id);
+
+        if (!Number.isInteger(classId) || classId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Valid class ID is required."
+                message: "Please select a valid class."
+            });
+        }
+
+        if (!academic_year || !String(academic_year).trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Academic year is required."
+            });
+        }
+
+        if (!start_date || !end_date) {
+            return res.status(400).json({
+                success: false,
+                message: "Start date and end date are required."
+            });
+        }
+
+        if (end_date < start_date) {
+            return res.status(400).json({
+                success: false,
+                message: "End date cannot be before start date."
+            });
+        }
+
+        const allowedStatuses = [
+            "scheduled",
+            "ongoing",
+            "completed"
+        ];
+
+        const examStatus = status || "scheduled";
+
+        if (!allowedStatuses.includes(examStatus)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid examination status."
             });
         }
 
         const examId = await Exam.createExam({
             exam_name: exam_name.trim(),
-            class_id: Number(class_id),
-            academic_year,
-            start_date: start_date || null,
-            end_date: end_date || null,
-            status: status || "scheduled"
+            class_id: classId,
+            academic_year: String(academic_year).trim(),
+            start_date,
+            end_date,
+            status: examStatus
         });
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
-            message: "Exam created successfully.",
-            data: { exam_id: examId }
+            message: "Examination created successfully.",
+            data: {
+                exam_id: examId,
+                exam_name: exam_name.trim(),
+                class_id: classId
+            }
         });
     } catch (error) {
-        console.error("Create exam error:", error);
+        console.error("Create Exam Error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to create exam."
+            message: "Failed to create examination."
         });
     }
 };
@@ -113,7 +155,7 @@ const updateExam = async (req, res) => {
         if (!Number.isInteger(examId) || examId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid exam ID."
+                message: "Invalid examination ID."
             });
         }
 
@@ -133,39 +175,77 @@ const updateExam = async (req, res) => {
             });
         }
 
-        if (!class_id || !Number.isInteger(Number(class_id)) || Number(class_id) <= 0) {
+        const classId = Number(class_id);
+
+        if (!Number.isInteger(classId) || classId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Valid class ID is required."
+                message: "Please select a valid class."
+            });
+        }
+
+        if (!academic_year || !String(academic_year).trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Academic year is required."
+            });
+        }
+
+        if (!start_date || !end_date) {
+            return res.status(400).json({
+                success: false,
+                message: "Start date and end date are required."
+            });
+        }
+
+        if (end_date < start_date) {
+            return res.status(400).json({
+                success: false,
+                message: "End date cannot be before start date."
+            });
+        }
+
+        const allowedStatuses = [
+            "scheduled",
+            "ongoing",
+            "completed"
+        ];
+
+        const examStatus = status || "scheduled";
+
+        if (!allowedStatuses.includes(examStatus)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid examination status."
             });
         }
 
         const affectedRows = await Exam.updateExam(examId, {
             exam_name: exam_name.trim(),
-            class_id: Number(class_id),
-            academic_year,
-            start_date: start_date || null,
-            end_date: end_date || null,
-            status: status || "scheduled"
+            class_id: classId,
+            academic_year: String(academic_year).trim(),
+            start_date,
+            end_date,
+            status: examStatus
         });
 
-        if (affectedRows === 0) {
+        if (!affectedRows) {
             return res.status(404).json({
                 success: false,
-                message: "Exam not found."
+                message: "Examination not found or cannot be updated."
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "Exam updated successfully."
+            message: "Examination updated successfully."
         });
     } catch (error) {
-        console.error("Update exam error:", error);
+        console.error("Update Exam Error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to update exam."
+            message: "Failed to update examination."
         });
     }
 };
@@ -178,32 +258,33 @@ const deleteExam = async (req, res) => {
         if (!Number.isInteger(examId) || examId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid exam ID."
+                message: "Invalid examination ID."
             });
         }
 
         const affectedRows = await Exam.deleteExam(examId);
 
-        if (affectedRows === 0) {
+        if (!affectedRows) {
             return res.status(404).json({
                 success: false,
-                message: "Exam not found."
+                message: "Examination not found or cannot be deleted."
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "Exam deleted successfully."
+            message: "Examination deleted successfully."
         });
     } catch (error) {
-        console.error("Delete exam error:", error);
+        console.error("Delete Exam Error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to delete exam. It may be linked to schedules or results."
+            message: "Failed to delete examination."
         });
     }
 };
+
 // Publish exam result
 const publishExamResult = async (req, res) => {
     try {
@@ -212,29 +293,62 @@ const publishExamResult = async (req, res) => {
         if (!Number.isInteger(examId) || examId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid exam ID."
+                message: "Invalid examination ID."
+            });
+        }
+
+        const exam = await Exam.getExamById(examId);
+
+        if (!exam) {
+            return res.status(404).json({
+                success: false,
+                message: "Examination not found."
+            });
+        }
+
+        if (exam.status === "published") {
+            return res.status(400).json({
+                success: false,
+                message: "This examination result is already published."
+            });
+        }
+
+        if (exam.status !== "completed") {
+            return res.status(400).json({
+                success: false,
+                message: "Only completed examinations can be published."
+            });
+        }
+
+        const readiness = await Exam.getPublicationReadiness(examId);
+
+        if (!readiness || !readiness.ready) {
+            return res.status(400).json({
+                success: false,
+                message: readiness?.message || "Result is not ready for publication.",
+                data: readiness
             });
         }
 
         const affectedRows = await Exam.publishExamResult(examId);
 
-        if (affectedRows === 0) {
-            return res.status(404).json({
+        if (!affectedRows) {
+            return res.status(400).json({
                 success: false,
-                message: "Exam not found."
+                message: "Unable to publish examination result."
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "Exam result published successfully."
+            message: "Examination result published successfully."
         });
     } catch (error) {
-        console.error("Publish result error:", error);
+        console.error("Publish Exam Result Error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to publish exam result."
+            message: "Failed to publish examination result."
         });
     }
 };
@@ -247,29 +361,45 @@ const unpublishExamResult = async (req, res) => {
         if (!Number.isInteger(examId) || examId <= 0) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid exam ID."
+                message: "Invalid examination ID."
+            });
+        }
+
+        const exam = await Exam.getExamById(examId);
+
+        if (!exam) {
+            return res.status(404).json({
+                success: false,
+                message: "Examination not found."
+            });
+        }
+
+        if (exam.status !== "published") {
+            return res.status(400).json({
+                success: false,
+                message: "This examination result is not published."
             });
         }
 
         const affectedRows = await Exam.unpublishExamResult(examId);
 
-        if (affectedRows === 0) {
-            return res.status(404).json({
+        if (!affectedRows) {
+            return res.status(400).json({
                 success: false,
-                message: "Exam not found."
+                message: "Unable to unpublish examination result."
             });
         }
 
-        res.status(200).json({
+        return res.status(200).json({
             success: true,
-            message: "Exam result unpublished successfully."
+            message: "Examination result unpublished successfully."
         });
     } catch (error) {
-        console.error("Unpublish result error:", error);
+        console.error("Unpublish Exam Result Error:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to unpublish exam result."
+            message: "Failed to unpublish examination result."
         });
     }
 };

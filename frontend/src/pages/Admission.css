@@ -18,9 +18,7 @@
   margin: 0 auto;
 }
 
-/* ================================
-   HEADER
-================================ */
+/* HEADER */
 
 .admission-header {
   margin-bottom: 25px;
@@ -39,9 +37,7 @@
   margin: 0;
 }
 
-/* ================================
-   FORM
-================================ */
+/* FORM */
 
 .admission-form {
   display: grid;
@@ -59,6 +55,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .form-group label {
@@ -79,7 +76,7 @@
   color: #334155;
   background: #ffffff;
   box-sizing: border-box;
-  transition: 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-group input:focus,
@@ -94,9 +91,21 @@
   min-height: 90px;
 }
 
-/* ================================
-   SUBMIT BUTTON
-================================ */
+/* INVALID INPUT */
+
+.form-group input:user-invalid,
+.form-group select:user-invalid,
+.form-group textarea:user-invalid {
+  border-color: #dc2626;
+}
+
+.form-group input:user-invalid:focus,
+.form-group select:user-invalid:focus,
+.form-group textarea:user-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.10);
+}
+
+/* SUBMIT BUTTON */
 
 .admission-submit-btn {
   grid-column: 1 / -1;
@@ -113,7 +122,7 @@
   transition: 0.2s ease;
 }
 
-.admission-submit-btn:hover {
+.admission-submit-btn:hover:not(:disabled) {
   background: #1d4ed8;
   transform: translateY(-1px);
 }
@@ -124,9 +133,7 @@
   transform: none;
 }
 
-/* ================================
-   SUCCESS & ERROR MESSAGES
-================================ */
+/* SUCCESS & ERROR MESSAGES */
 
 .success-message {
   padding: 13px 16px;
@@ -148,9 +155,7 @@
   font-size: 14px;
 }
 
-/* ================================
-   ADMISSION RECORDS
-================================ */
+/* ADMISSION RECORDS */
 
 .admission-records {
   width: 100%;
@@ -183,9 +188,7 @@
   margin: 0;
 }
 
-/* ================================
-   REFRESH BUTTON
-================================ */
+/* REFRESH BUTTON */
 
 .refresh-btn {
   padding: 10px 17px;
@@ -199,7 +202,7 @@
   transition: 0.2s ease;
 }
 
-.refresh-btn:hover {
+.refresh-btn:hover:not(:disabled) {
   background: #2563eb;
   color: #ffffff;
 }
@@ -209,9 +212,7 @@
   cursor: not-allowed;
 }
 
-/* ================================
-   TABLE
-================================ */
+/* TABLE */
 
 .table-wrapper {
   width: 100%;
@@ -260,9 +261,7 @@
   border-bottom: none;
 }
 
-/* ================================
-   STATUS BADGES
-================================ */
+/* STATUS BADGES */
 
 .status {
   display: inline-flex;
@@ -296,9 +295,7 @@
   background: #dbeafe;
 }
 
-/* ================================
-   ADMIN ACTION BUTTONS
-================================ */
+/* ADMIN ACTION BUTTONS */
 
 .admission-actions {
   display: flex;
@@ -357,9 +354,7 @@
   font-size: 11px;
 }
 
-/* ================================
-   EMPTY & LOADING
-================================ */
+/* EMPTY & LOADING */
 
 .records-info,
 .empty-message {
@@ -377,9 +372,7 @@
   text-align: right;
 }
 
-/* ================================
-   RESPONSIVE DESIGN
-================================ */
+/* RESPONSIVE DESIGN */
 
 @media (max-width: 768px) {
   .admission-page {

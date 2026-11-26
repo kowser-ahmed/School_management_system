@@ -1,8 +1,10 @@
+
 const express = require("express");
 
 const {
     getAllResults,
     getResultById,
+    searchStudents,
     getResultsByStudentId,
     getResultsByExamId,
     createResult,
@@ -25,12 +27,12 @@ router.get(
     getAllResults
 );
 
-// Get result by ID
+// Search students by ID, code, name, email, phone or roll
 router.get(
-    "/:id",
+    "/search",
     authenticateToken,
     authorizePermission("results:read"),
-    getResultById
+    searchStudents
 );
 
 // Get results by student ID
@@ -47,6 +49,14 @@ router.get(
     authenticateToken,
     authorizePermission("results:read"),
     getResultsByExamId
+);
+
+// Get result by ID
+router.get(
+    "/:id",
+    authenticateToken,
+    authorizePermission("results:read"),
+    getResultById
 );
 
 // Create result
